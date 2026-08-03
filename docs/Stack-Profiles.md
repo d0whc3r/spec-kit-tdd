@@ -77,6 +77,122 @@ or Docker Compose where a real dependency is required. Contract testing is Pact 
 most ecosystems, or Spring Cloud Contract on the JVM. Approval and snapshot: Verify,
 ApprovalTests, insta, syrupy, jest or vitest snapshots, goldie.
 
+## The same cycle in five ecosystems
+
+The artifacts do not change shape when the language does. Below is one behavior,
+`U2 accepts a token expiring exactly at the current instant`, driven in five stacks.
+
+The test list row is identical in all five, word for word, because a behavior is
+prose about an observable result and not a call into a runner:
+
+| id  | behavior                                                | traces     | kind    | state |
+| --- | ------------------------------------------------------- | ---------- | ------- | ----- |
+| U2  | Accepts a token expiring exactly at the current instant | AC-2, FR-2 | example | DONE  |
+
+What follows the ecosystem is the cycle log's test reference, the command that
+produced the red, and the failure text, because those three are copied from the
+runner rather than written.
+
+### TypeScript, vitest
+
+`single: 'pnpm vitest run {file} -t "{name}"'`
+
+```markdown
+## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `src/auth/session.test.ts::accepts a token expiring now` (new)
+- red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
+  -> `AssertionError: expected 'expired' to be undefined` (1 failed)
+- green: `src/auth/session.ts:31` changed `<` to `<=`. Suite -> 126 passed
+- refactor: extracted `isExpired(claims, now)`; suite re-run green after the extraction
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+```
+
+### Python, pytest
+
+`single: 'pytest "{file}::{name}" -q'`
+
+```markdown
+## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `tests/auth/test_session.py::test_accepts_token_expiring_now` (new)
+- red: `pytest "tests/auth/test_session.py::test_accepts_token_expiring_now" -q`
+  -> `E   AssertionError: assert 'expired' is None` (1 failed)
+- green: `src/auth/session.py:31` changed `<` to `<=`. Suite -> 126 passed
+- refactor: extracted `is_expired(claims, now)`; suite re-run green after the extraction
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+```
+
+### Go, testing
+
+`single: "go test ./{pkg} -run '^{name}$'"`
+
+```markdown
+## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `internal/auth/session_test.go::TestAcceptsTokenExpiringNow` (new)
+- red: `go test ./internal/auth -run '^TestAcceptsTokenExpiringNow$'`
+  -> `session_test.go:42: reason = "expired", want ""` then `FAIL` (1 failed)
+- green: `internal/auth/session.go:31` changed `<` to `<=`. Suite -> ok, 126 tests
+- refactor: extracted `isExpired(claims, now)`; suite re-run green after the extraction
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+```
+
+Table-driven suites address the case rather than the function:
+`go test ./internal/auth -run '^TestSession/accepts_a_token_expiring_now$'`.
+
+### JVM, JUnit 5 with Maven
+
+`single: "mvn -q test -Dtest='{name}'"`
+
+```markdown
+## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `src/test/java/auth/SessionTest.java::acceptsTokenExpiringNow` (new)
+- red: `mvn -q test -Dtest='SessionTest#acceptsTokenExpiringNow'`
+  -> `org.opentest4j.AssertionFailedError: expected: <null> but was: <expired>`
+  (Tests run: 1, Failures: 1)
+- green: `src/main/java/auth/Session.java:31` changed `<` to `<=`. Suite -> 126 passed
+- refactor: extracted `isExpired(claims, now)`; suite re-run green after the extraction
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+```
+
+### Rust, cargo test
+
+`single: 'cargo test {name} -- --exact'`
+
+```markdown
+## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `src/auth/session.rs::tests::accepts_token_expiring_now` (new)
+- red: `cargo test auth::session::tests::accepts_token_expiring_now -- --exact`
+  -> `assertion `left == right` failed: left: Some("expired"), right: None`
+  (test result: FAILED. 0 passed; 1 failed)
+- green: `src/auth/session.rs:31` changed `<` to `<=`. Suite -> 126 passed
+- refactor: extracted `is_expired(claims, now)`; suite re-run green after the extraction
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+```
+
+### What moved and what did not
+
+| Part of the artifact                         | Ecosystem specific                                   |
+| -------------------------------------------- | ---------------------------------------------------- |
+| Behavior text on the list                    | No. Same sentence in all five                        |
+| `traces`, `kind`, `state`                    | No                                                   |
+| Test reference                               | Yes. The runner's own id for a single test           |
+| The `red` command                            | Yes. Copied from the profile, never composed by hand |
+| The `red` output                             | Yes. Quoted verbatim from the runner                 |
+| `green`, `refactor`, `commit` lines          | No. A file, a line, and what changed                 |
+| Verdict, states, mutation table in the audit | No                                                   |
+
+The test name inside the file is the one place where the behavior sentence gets
+reshaped, and it follows whatever the ecosystem already does: an `it("accepts a token
+expiring now")` in JS, `test_accepts_token_expiring_now` in pytest,
+`TestAcceptsTokenExpiringNow` in Go, `acceptsTokenExpiringNow` in JUnit. The loop
+copies the convention out of the exemplar test file recorded in the profile instead of
+imposing one, which is also why no example test source is shipped with this extension:
+the naming that matters is yours, not ours.
+
 ## The profile file
 
 Frontmatter carries the machine-readable commands, one entry per stack, with `{file}`,

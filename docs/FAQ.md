@@ -165,6 +165,23 @@ it.
 If an existing principle contradicts TDD, `/speckit.tdd.setup` presents both and asks
 which governs rather than deciding for you.
 
+## Which language does it support?
+
+All of them, because it does not know any of them. `/speckit.tdd.setup` detects the stack
+from your manifests, scripts, CI config, and test layout, runs each candidate command to
+prove it works, and writes them to a profile the other commands read.
+
+That is a claim worth checking rather than believing, so [Stack
+Profiles](Stack-Profiles.md#the-same-cycle-in-five-ecosystems) drives the same behavior in
+vitest, pytest, `go test`, JUnit, and `cargo test` side by side. The behavior text on the
+test list is identical in all five. Three lines per cycle differ, and all three are quoted
+from the runner rather than composed: the test reference, the red command, and the failure
+output.
+
+The test name inside the test file follows whatever your repository already does, because
+the loop imitates the exemplar test file recorded in the profile instead of imposing a
+convention.
+
 ## Does it support monorepos?
 
 Yes. `/speckit.tdd.setup` records one stack entry per ecosystem, each with its own working

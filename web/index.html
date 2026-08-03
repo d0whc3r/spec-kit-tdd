@@ -422,6 +422,185 @@ mutants_survived: 3
             <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki/Examples">Examples page</a>
             in the wiki.
           </p>
+
+          <h3 class="example-subhead">The same cycle in your language</h3>
+          <p class="section-lede">
+            Nothing above is TypeScript-shaped by accident. Here is that same behavior,
+            <code>U2</code>, driven in five stacks. The test list row is identical in all five, word
+            for word. Three things follow the ecosystem, and all three are copied out of the runner
+            rather than written: the test reference, the command that produced the red, and the
+            failure text.
+          </p>
+
+          <div class="example-card">
+            <div class="example-tabs tabs" role="tablist" aria-label="Ecosystem">
+              <button
+                id="tab-lang-ts"
+                class="tab is-active"
+                role="tab"
+                aria-selected="true"
+                aria-controls="panel-lang-ts"
+              >
+                vitest
+              </button>
+              <button
+                id="tab-lang-py"
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-lang-py"
+              >
+                pytest
+              </button>
+              <button
+                id="tab-lang-go"
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-lang-go"
+              >
+                go test
+              </button>
+              <button
+                id="tab-lang-jvm"
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-lang-jvm"
+              >
+                JUnit 5
+              </button>
+              <button
+                id="tab-lang-rs"
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-lang-rs"
+              >
+                cargo test
+              </button>
+            </div>
+
+            <div class="example-body example-body-single">
+              <div
+                id="panel-lang-ts"
+                class="tab-panel is-active example-pane"
+                role="tabpanel"
+                aria-labelledby="tab-lang-ts"
+              >
+                <div class="example-head">
+                  <span class="example-tag">Profile</span>
+                  <code>single: 'pnpm vitest run {file} -t "{name}"'</code>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>- test: `src/auth/session.test.ts::accepts a token expiring now` (new)
+- red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
+  -> `AssertionError: expected 'expired' to be undefined` (1 failed)
+- green: `src/auth/session.ts:31` changed `&lt;` to `&lt;=`. Suite -> 126 passed
+- refactor: extracted `isExpired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)</code></pre>
+              </div>
+
+              <div
+                id="panel-lang-py"
+                class="tab-panel example-pane"
+                role="tabpanel"
+                aria-labelledby="tab-lang-py"
+                hidden
+              >
+                <div class="example-head">
+                  <span class="example-tag">Profile</span>
+                  <code>single: 'pytest "{file}::{name}" -q'</code>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>- test: `tests/auth/test_session.py::test_accepts_token_expiring_now` (new)
+- red: `pytest "tests/auth/test_session.py::test_accepts_token_expiring_now" -q`
+  -> `E   AssertionError: assert 'expired' is None` (1 failed)
+- green: `src/auth/session.py:31` changed `&lt;` to `&lt;=`. Suite -> 126 passed
+- refactor: extracted `is_expired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)</code></pre>
+              </div>
+
+              <div
+                id="panel-lang-go"
+                class="tab-panel example-pane"
+                role="tabpanel"
+                aria-labelledby="tab-lang-go"
+                hidden
+              >
+                <div class="example-head">
+                  <span class="example-tag">Profile</span>
+                  <code>single: "go test ./{pkg} -run '^{name}$'"</code>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>- test: `internal/auth/session_test.go::TestAcceptsTokenExpiringNow` (new)
+- red: `go test ./internal/auth -run '^TestAcceptsTokenExpiringNow$'`
+  -> `session_test.go:42: reason = "expired", want ""` then `FAIL` (1 failed)
+- green: `internal/auth/session.go:31` changed `&lt;` to `&lt;=`. Suite -> ok, 126 tests
+- refactor: extracted `isExpired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)</code></pre>
+              </div>
+
+              <div
+                id="panel-lang-jvm"
+                class="tab-panel example-pane"
+                role="tabpanel"
+                aria-labelledby="tab-lang-jvm"
+                hidden
+              >
+                <div class="example-head">
+                  <span class="example-tag">Profile</span>
+                  <code>single: "mvn -q test -Dtest='{name}'"</code>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>- test: `src/test/java/auth/SessionTest.java::acceptsTokenExpiringNow` (new)
+- red: `mvn -q test -Dtest='SessionTest#acceptsTokenExpiringNow'`
+  -> `org.opentest4j.AssertionFailedError: expected: &lt;null&gt; but was: &lt;expired&gt;`
+  (Tests run: 1, Failures: 1)
+- green: `src/main/java/auth/Session.java:31` changed `&lt;` to `&lt;=`. Suite -> 126 passed
+- refactor: extracted `isExpired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)</code></pre>
+              </div>
+
+              <div
+                id="panel-lang-rs"
+                class="tab-panel example-pane"
+                role="tabpanel"
+                aria-labelledby="tab-lang-rs"
+                hidden
+              >
+                <div class="example-head">
+                  <span class="example-tag">Profile</span>
+                  <code>single: 'cargo test {name} -- --exact'</code>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>- test: `src/auth/session.rs::tests::accepts_token_expiring_now` (new)
+- red: `cargo test auth::session::tests::accepts_token_expiring_now -- --exact`
+  -> `assertion left == right failed: left: Some("expired"), right: None`
+  (test result: FAILED. 0 passed; 1 failed)
+- green: `src/auth/session.rs:31` changed `&lt;` to `&lt;=`. Suite -> 126 passed
+- refactor: extracted `is_expired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <p class="note">
+            The behavior sentence on the test list never changes. The test name inside the file
+            does, and it follows whatever your repository already does:
+            <code>it("accepts a token expiring now")</code>,
+            <code>test_accepts_token_expiring_now</code>, <code>TestAcceptsTokenExpiringNow</code>.
+            The loop copies that convention out of the exemplar test file recorded in your profile
+            instead of imposing one, which is why no example test source ships with the extension.
+            Full comparison on the
+            <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki/Stack-Profiles">Stack Profiles</a>
+            page.
+          </p>
         </div>
       </section>
 
@@ -646,6 +825,12 @@ specify extension update tdd</code></pre>
                 Python, JVM, .NET, Go, Rust, Ruby, PHP, Swift, Elixir, C and C++, and Dart, along
                 with their coverage, mutation, and property-based tooling. Detection always wins
                 over the table.
+              </p>
+              <p>
+                That is a claim worth checking rather than believing, so
+                <a href="#examples">the same cycle</a> is shown above in five ecosystems. The
+                behavior text on the test list is identical in all five; three lines per cycle
+                differ, and all three are quoted from the runner rather than composed.
               </p>
             </details>
             <details>

@@ -18,6 +18,15 @@ requirements, two components, eleven cycles.
 In a real project the profile lives at `.specify/memory/tdd-profile.md`. It sits at the
 top level here so the example is browsable as one folder.
 
+The stack is TypeScript because an example has to be written in something. The same
+feature under pytest, `go test`, JUnit, or `cargo test` produces these same four files
+with the same sections, and three lines per cycle differ: the test reference, the
+command that produced the red, and the failure text, all three copied out of the runner.
+[Stack
+Profiles](https://github.com/d0whc3r/spec-kit-tdd/wiki/Stack-Profiles#the-same-cycle-in-five-ecosystems)
+shows that cycle side by side in five ecosystems, which is why this folder holds one
+language instead of five near-identical copies.
+
 ## What the test list caught before any code was written
 
 The plan phase is the cheapest place to find a hole. Two of them showed up here:

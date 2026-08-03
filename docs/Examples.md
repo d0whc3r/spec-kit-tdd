@@ -15,6 +15,13 @@ requirements, two components, eleven cycles.
 | [`cycle-log.md`](../examples/specs/003-user-auth/tdd/cycle-log.md)       | `/speckit.tdd.run`    |
 | [`verification.md`](../examples/specs/003-user-auth/tdd/verification.md) | `/speckit.tdd.verify` |
 
+The stack is TypeScript because an example has to be written in something. It costs you
+nothing if you are not in TypeScript: the same feature under pytest, `go test`, JUnit,
+or `cargo test` produces the same four files with the same sections, and three lines per
+cycle differ. [Stack Profiles](Stack-Profiles.md#the-same-cycle-in-five-ecosystems) shows
+that cycle side by side in five ecosystems, which is why this folder holds one language
+instead of five near-identical copies.
+
 ## 1. The profile
 
 `/speckit.tdd.setup` detected vitest, ran each candidate command, and recorded only

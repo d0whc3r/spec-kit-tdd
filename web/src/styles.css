@@ -599,6 +599,23 @@ pre code {
   align-items: start;
 }
 
+/* One panel per ecosystem tab, so no second column and no arrow. */
+.example-body-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.example-body-single .tab-panel {
+  display: none;
+}
+
+.example-body-single .tab-panel.is-active {
+  display: flex;
+}
+
+.example-subhead {
+  margin: 48px 0 12px;
+}
+
 .example-arrow {
   align-self: center;
   color: var(--accent);

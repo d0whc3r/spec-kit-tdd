@@ -88,6 +88,12 @@ Starting points are documented for JS and TS, Python, JVM, .NET, Go, Rust, Ruby,
 PHP, Swift, Elixir, C and C++, and Dart, with their coverage, mutation, and
 property-based tooling. Detection always wins over the table.
 
+That is a claim worth checking rather than believing, so [the same cycle is driven
+in five ecosystems](https://github.com/d0whc3r/spec-kit-tdd/wiki/Stack-Profiles#the-same-cycle-in-five-ecosystems)
+side by side. The behavior text on the test list is identical in all five. Three
+lines per cycle differ, and all three are quoted from the runner rather than
+composed: the test reference, the red command, and the failure output.
+
 ## Install
 
 Install directly from the latest release. This needs no catalog setup and is the recommended path:
