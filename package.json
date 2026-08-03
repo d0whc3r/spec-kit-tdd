@@ -1,6 +1,6 @@
 {
   "name": "spec-kit-tdd",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "description": "Drives spec-kit implementation with tests: a language-agnostic red-green-refactor loop with a per-feature test list, recorded red and green evidence, and mutation-checked test strength.",
   "keywords": [

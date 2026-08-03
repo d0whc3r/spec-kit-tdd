@@ -99,7 +99,7 @@ composed: the test reference, the red command, and the failure output.
 Install directly from the latest release. This needs no catalog setup and is the recommended path:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.1/tdd-1.1.1.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
 Change the version in the URL to pin a different release.

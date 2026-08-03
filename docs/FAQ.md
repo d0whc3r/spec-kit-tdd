@@ -244,7 +244,7 @@ If you approved the community catalog, `specify extension update tdd`. Otherwise
 the direct install with a newer release URL:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.1/tdd-1.1.1.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
 Your `specs/` tree and your profile are not touched.
