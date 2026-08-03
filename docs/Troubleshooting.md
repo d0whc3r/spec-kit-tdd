@@ -47,11 +47,34 @@ entry exists and the files do not, re-run the install.
 
 ### The hooks never fire
 
-`after_tasks` and `after_implement` are `optional: true`, so they prompt rather than run
-silently. If nothing prompts, check `auto_execute_hooks` in `.specify/extensions.yml` and
-that the `tdd` entry is listed under `installed`. You can always run
-`/speckit.tdd.plan` and `/speckit.tdd.verify` by hand; the hooks are a convenience, not a
-requirement.
+Three hooks ship: `after_tasks` runs `plan`, `before_implement` runs `run`, and
+`after_implement` runs `verify`. `after_tasks` and `after_implement` are `optional: true`,
+so they prompt rather than run silently. If nothing prompts, check `auto_execute_hooks` in
+`.specify/extensions.yml` and that the `tdd` entry is listed under `installed`. You can
+always run all four commands by hand; the hooks are a convenience, not a requirement.
+
+Hooks also need a recent Spec Kit. Before 0.11.9, spec-kit printed a mandatory hook's
+directive without actually invoking it, which is why this extension requires `>=0.11.9`.
+
+### `/speckit.implement` wrote the feature without running the loop
+
+Check that `before_implement` in `.specify/extensions.yml` still reads `optional: false`.
+spec-kit waits for a hook only when the flag is false; an optional pre-hook prints its
+offer and the same run carries on to implement every unchecked task, test-after. If the
+flag is right and the loop still did not run, you are on a Spec Kit older than 0.11.9.
+
+### You want `/speckit.implement` without the loop in front of it
+
+Set `enabled: false` on the `before_implement` hook in `.specify/extensions.yml`. spec-kit
+filters disabled hooks before it reads the `optional` flag. Run `/speckit.tdd.run`
+yourself when you want the loop.
+
+### `/speckit.implement` re-implemented a behavior the loop already drove
+
+The loop ticks a task only when it can read a behavior id from the task text, so an
+unmarked behavioral task looks like open work to `/speckit.implement`. Re-run
+`/speckit.tdd.plan refresh` to put the ids back on the open tasks, and check the loop's
+report: it lists both the tasks it ticked and the open tasks with no marker.
 
 ## Profile problems
 

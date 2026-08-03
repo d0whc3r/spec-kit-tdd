@@ -6,10 +6,12 @@ red-green-refactor one behavior at a time while recording the failure that
 preceded each fix, then audits the result from cold context.
 
 ```
-spec-kit  ->  /speckit.specify ... /speckit.tasks       (the specification)
-you       ->  /speckit.tdd.plan                          (criteria become a test list)
-loop      ->  /speckit.tdd.run                           (red, green, refactor, logged)
-audit     ->  /speckit.tdd.verify                        (evidence, smells, mutants)
+once      ->  /speckit.tdd.setup                   (the stack, proved by running it)
+spec-kit  ->  /speckit.specify ... /speckit.tasks  (the specification)
+plan      ->  /speckit.tdd.plan                    (criteria become a test list)
+loop      ->  /speckit.tdd.run                     (red, green, refactor, logged)
+rest      ->  /speckit.implement                   (whatever was not a behavior change)
+audit     ->  /speckit.tdd.verify                  (evidence, smells, mutants)
 ```
 
 ## Why it exists
@@ -45,17 +47,18 @@ bug.
 
 ## The commands at a glance
 
-| Command               | What it does                                                                                                                   | Writes                                                           |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| `/speckit.tdd.setup`  | Detects every test stack and proves each command by running it. Once per repository.                                           | `.specify/memory/tdd-profile.md`, constitution (with approval)   |
-| `/speckit.tdd.plan`   | Acceptance criteria and plan components become a test list; test tasks in `tasks.md` become mandatory and correctly ordered.   | `specs/<feature>/tdd/test-list.md`, `cycle-log.md`, `tasks.md`   |
-| `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                     | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
-| `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation on changed files, criteria coverage. Fails closed. | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
+| Command               | What it does                                                                                                                   | Writes                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `/speckit.tdd.setup`  | Detects every test stack and proves each command by running it. Once per repository.                                           | `.specify/memory/tdd-profile.md`, constitution (with approval)  |
+| `/speckit.tdd.plan`   | Acceptance criteria and plan components become a test list; test tasks in `tasks.md` become mandatory and correctly ordered.   | `tdd/test-list.md`, `tdd/cycle-log.md`, `tasks.md`              |
+| `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                     | tests, source, `tdd/cycle-log.md`, ticks the tasks it completed |
+| `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation on changed files, criteria coverage. Fails closed. | `tdd/verification.md`, remediation in `tasks.md`                |
 
-Three optional hooks offer the right command at the right moment: `plan` after
-`/speckit.tasks`, `run` before `/speckit.implement` starts writing code, and
-`verify` after it finishes. You can decline any of them. All modifiers are covered
-in [Commands](Commands.md).
+Three hooks put the right command at the right moment: `plan` after `/speckit.tasks`
+and `verify` after `/speckit.implement` both prompt and can be declined, while `run`
+runs before `/speckit.implement` writes anything, because a prompt there would arrive
+after the code was already written. Disable any hook in `.specify/extensions.yml`. All
+modifiers are covered in [Commands](Commands.md).
 
 ## Hard rules
 

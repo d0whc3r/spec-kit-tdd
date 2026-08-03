@@ -25,14 +25,16 @@ specs/<feature>/
     └── verification.md     the audit report
 ```
 
-`<feature>` is spec-kit's own directory name (for example `003-user-auth`), never one
-this extension invents. The current feature comes from spec-kit's own resolver:
-`FEATURE_DIR` out of `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`,
-which reads `SPECIFY_FEATURE_DIRECTORY` first and `.specify/feature.json` second. If
-neither is set, the command asks rather than guessing from the branch name.
+`specs/<feature>/` is the usual layout, not a fixed path. The current feature comes
+from spec-kit's own resolver: `FEATURE_DIR` out of
+`.specify/scripts/bash/check-prerequisites.sh --json --paths-only`, which reads
+`SPECIFY_FEATURE_DIRECTORY` first and `.specify/feature.json` second. Either can point
+outside `specs/`, which is why the commands build every path from `FEATURE_DIR` instead
+of assuming one. If neither is set, the command asks rather than guessing from the
+branch name.
 
-There is no index across features. Commands glob `specs/*/tdd/test-list.md` and read
-frontmatter.
+There is no index across features. A cross-feature sweep globs `tdd/test-list.md` under
+whatever tree holds the resolved feature directory and reads frontmatter.
 
 ## Test list frontmatter
 

@@ -7,7 +7,9 @@ input, what it produces as output, and in what order to run them.
 
 ## Prerequisites
 
-- Spec Kit `>=0.2.0` initialized in your project (`specify init`). The extension
+- Spec Kit `>=0.11.9` initialized in your project (`specify init`). That is the
+  first release that both resolves the feature directory from `.specify/feature.json`
+  and actually runs a mandatory hook, which `before_implement` depends on. The extension
   plugs into the core lifecycle (`/speckit.specify`, `/speckit.clarify`,
   `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`), so those must be
   available.
@@ -50,15 +52,16 @@ After install, four slash commands become available in your assistant.
 
 ## The Commands
 
-| Command               | Reads                                                          | Writes                                                           | Role                                                     |
-| --------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- |
-| `/speckit.tdd.setup`  | manifests, scripts, CI config, test layout                     | `.specify/memory/tdd-profile.md`, constitution (with approval)   | Make the stack explicit, once per repository             |
-| `/speckit.tdd.plan`   | `spec.md`, `plan.md`, `tasks.md`, the profile                  | `specs/<feature>/tdd/test-list.md`, `cycle-log.md`, `tasks.md`   | Criteria become a test list, test tasks become mandatory |
-| `/speckit.tdd.run`    | the test list, the profile, `spec.md`                          | tests, source, `specs/<feature>/tdd/cycle-log.md`                | Drive red-green-refactor, one behavior per cycle         |
-| `/speckit.tdd.verify` | the cycle log, git history, the tests and source as they stand | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` | Grade the discipline and the strength of the tests, cold |
+| Command               | Reads                                                          | Writes                                                         | Role                                                     |
+| --------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------- |
+| `/speckit.tdd.setup`  | manifests, scripts, CI config, test layout                     | `.specify/memory/tdd-profile.md`, constitution (with approval) | Make the stack explicit, once per repository             |
+| `/speckit.tdd.plan`   | `spec.md`, `plan.md`, `tasks.md`, the profile                  | `tdd/test-list.md`, `tdd/cycle-log.md`, `tasks.md`             | Criteria become a test list, test tasks become mandatory |
+| `/speckit.tdd.run`    | the test list, the profile, `tasks.md`, `spec.md`              | tests, source, `tdd/cycle-log.md`, the tasks it completed      | Drive red-green-refactor, one behavior per cycle         |
+| `/speckit.tdd.verify` | the cycle log, git history, the tests and source as they stand | `tdd/verification.md`, remediation in `tasks.md`               | Grade the discipline and the strength of the tests, cold |
 
-`/speckit.tdd.run` is the only command that writes tests or source. The other
-three read, plan, and grade. `verify` never fixes what it finds, on purpose: an
+Paths in the Writes column are relative to the feature directory spec-kit resolves,
+usually `specs/<feature>/`. `/speckit.tdd.run` is the only command that writes tests
+or source. The other three read, plan, and grade. `verify` never fixes what it finds, on purpose: an
 auditor that edits the code it grades cannot be trusted about it.
 
 ---
@@ -78,8 +81,9 @@ auditor that edits the code it grades cannot be trusted about it.
        |                                                                     tasks.md (tests mandatory, ordered)
        v
  /speckit.implement        ->  /speckit.tdd.run     ->  red -> green    ->  cycle-log.md (one entry per cycle)
-   (before it starts)          (before_implement hook)  -> refactor          test-list.md (state -> DONE)
-                                                        -> commit            tests + source in the working tree
+   (waits for it)              (before_implement hook)  -> refactor          test-list.md (state -> DONE)
+                                                        -> commit            tasks.md (behavioral tasks ticked)
+                                                                             tests + source in the working tree
 
  /speckit.implement        ->  /speckit.tdd.verify  ->  evidence,       ->  verification.md (verdict)
    (after it finishes)         (after_implement hook)   smells,             tasks.md (remediation phase)
@@ -96,10 +100,12 @@ A typical feature, start to finish:
 1. /speckit.tdd.setup                      (once per repository)
 2. /speckit.specify, /speckit.clarify, /speckit.plan, /speckit.tasks
 3. /speckit.tdd.plan                       (or accept the after_tasks hook)
-4. Read specs/<feature>/tdd/test-list.md   (it is meant to be reviewed)
-5. /speckit.tdd.run all                    (or accept the before_implement hook)
-6. /speckit.tdd.verify                     (or accept the after_implement hook)
-7. Clear any remediation tasks, then re-run /speckit.tdd.verify
+4. Read <feature dir>/tdd/test-list.md     (it is meant to be reviewed)
+5. /speckit.tdd.run                        (every behavior; /speckit.implement
+                                            runs this first and waits for it)
+6. /speckit.implement                      (whatever was not a behavior change)
+7. /speckit.tdd.verify                     (or accept the after_implement hook)
+8. Clear any remediation tasks, then re-run /speckit.tdd.verify
 ```
 
 Steps 1 and 2 are independent: set up the stack whenever, the spec whenever. From
@@ -134,8 +140,9 @@ runner at all. Each of those changes what you should do next.
 Reads `spec.md` and `plan.md` and writes the test list: one acceptance behavior
 per acceptance criterion (the outer loop), plus the unit behaviors each component
 owns (the inner loop), every line traced to the criterion or requirement it
-serves. Then it edits `tasks.md`: test tasks stop being optional and each one is
-placed before the implementation it covers.
+serves. Then it edits `tasks.md`: test tasks stop being optional, each one is
+placed before the implementation it covers, and every behavioral task carries its
+behavior id (`[U3]`) so the loop can tick it later.
 
 ```text
 /speckit.tdd.plan
@@ -153,12 +160,16 @@ missing boundary case or a criterion nobody can test.
 
 The loop. One behavior per cycle: write one test, run it, confirm it fails for the
 right reason, record the failure, make it pass with the smallest change, run the
-full suite, refactor while green, commit.
+full suite, refactor while green, tick the tasks that behavior covers, commit.
+
+With no arguments it walks the whole list, because the `before_implement` hook
+invokes it without arguments and one cycle out of twenty would leave the rest to be
+written test-after.
 
 ```text
-/speckit.tdd.run              # one cycle on the next PENDING behavior
-/speckit.tdd.run next         # the same thing, spelled out
-/speckit.tdd.run all          # keep cycling until the list is done
+/speckit.tdd.run              # every PENDING behavior, one cycle each
+/speckit.tdd.run all          # the same thing, spelled out
+/speckit.tdd.run next         # stop after one cycle
 /speckit.tdd.run U3 U4        # specific behaviors, in that order
 /speckit.tdd.run outer        # the next acceptance behavior
 /speckit.tdd.run resume       # continue an interrupted cycle
@@ -170,6 +181,10 @@ It stops rather than improvising when the suite is red at baseline, an acceptanc
 criterion is ambiguous enough that two reasonable tests would contradict each
 other, or going green would require changing a test it did not write. A blocked
 loop with evidence is a good outcome.
+
+It ticks a task's checkbox only when every behavior the task text names is `DONE`.
+That is what `/speckit.implement` reads to decide what is left, so the two never
+implement the same behavior twice.
 
 ### `/speckit.tdd.verify`
 
@@ -194,7 +209,9 @@ and unmeasured mutation means unmeasured.
 
 ## The TDD Artifacts
 
-Everything lives inside the feature directory spec-kit already created:
+Everything lives inside the feature directory spec-kit already created. That
+directory comes from `SPECIFY_FEATURE_DIRECTORY` or `.specify/feature.json`, so
+`specs/003-user-auth/` below is the usual layout rather than a fixed path:
 
 ```
 specs/
@@ -221,8 +238,9 @@ failure output, what made it green, what the refactor changed, and the commit.
 That record is the audit's primary evidence, which is why it is never edited after
 the fact.
 
-There is no index file across features. Commands discover state by globbing
-`specs/*/tdd/test-list.md` and reading frontmatter.
+There is no index file across features. A cross-feature sweep globs
+`tdd/test-list.md` under whatever tree holds the resolved feature directory and reads
+frontmatter.
 
 ---
 
