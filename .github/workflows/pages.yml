@@ -33,7 +33,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Always deploy the tip of main, i.e. the post-release commit that
           # carries the bumped version. For workflow_run the default checkout
