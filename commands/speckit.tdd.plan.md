@@ -49,8 +49,9 @@ With no input, run the full workflow on the current feature.
    behavior that traces to nothing is either a gap in the spec (raise it) or scope
    creep (drop it). Never invent a requirement to justify a test.
 3. **Never write a test or touch source code.** The files you may create or modify
-   are `specs/<feature>/tdd/test-list.md`, `specs/<feature>/tdd/cycle-log.md`
-   (baseline entry only), and `specs/<feature>/tasks.md`. Nothing else.
+   are `FEATURE_DIR/tdd/test-list.md`, `FEATURE_DIR/tdd/cycle-log.md` (baseline
+   entry only), and `FEATURE_DIR/tasks.md`, where `FEATURE_DIR` is what Phase 0
+   resolved. Nothing else.
 4. **Never renumber or rewrite completed work in `tasks.md`.** Preserve existing
    task ids, checkbox states, and the file's format exactly. Insert and reorder
    only what is still open, and report every change you made.
@@ -76,9 +77,12 @@ This command reads three reference files from the installed extension:
   `.specify/extensions/tdd/templates/tdd-stack-profile.md` (what the profile
   contains, so you can copy the verification commands into the list).
 
-Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
-instead. That path is spec-kit's own override layer, and it is how a project tunes
-an extension's discipline without forking it.
+Resolve each one through spec-kit's template stack, first match wins:
+`.specify/templates/overrides/<name>.md`, then
+`.specify/presets/<preset-id>/templates/<name>.md`, then the extension's own copy
+at `.specify/extensions/tdd/templates/<name>.md`. That stack is how a project or
+an installed preset tunes this extension's discipline without forking it, and
+presets sit above extensions precisely so a preset can override this text.
 
 ## Workflow
 
@@ -90,10 +94,12 @@ an extension's discipline without forking it.
 - Resolve the feature directory with spec-kit's own resolver, not a guess: run
   `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
   `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
-  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
-  then `.specify/feature.json`, and errors when neither is set. If the script is
-  absent or errors, ask which feature to plan. Never infer the feature from the
-  branch name or from file timestamps: a test list written into the wrong feature
+  from its JSON. It is an absolute path and it is **not** always under `specs/`,
+  so build every path below from `FEATURE_DIR` rather than from a `specs/<feature>`
+  guess. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`, then
+  `.specify/feature.json`, and errors when neither is set. If the script is absent
+  or errors, ask which feature to plan. Never infer the feature from the branch
+  name or from file timestamps: a test list written into the wrong feature
   directory is a silent failure.
 - Confirm `spec.md` exists. `plan.md` is needed for the inner loop; without it,
   run `outer-only` and say so.
@@ -194,24 +200,29 @@ in the report.
 
 ### Phase 5: Write the artifacts
 
-**The test list** at `specs/<feature>/tdd/test-list.md`, exactly in the shape of
-`templates/tdd-test-list-template.md`: frontmatter, outer loop table, inner loop
-tables grouped by component, unplaced items, out of scope, and the verification
-commands copied verbatim from the profile so the file stands alone.
+**The test list** at `FEATURE_DIR/tdd/test-list.md`, exactly in the shape of the
+test list template resolved in the Templates section: frontmatter, outer loop
+table, inner loop tables grouped by component, unplaced items, out of scope, and
+the verification commands copied verbatim from the profile so the file stands
+alone.
 
 Check it against that template's "Quality bar" before finishing. Every criterion
 covered, every trace resolving to a real id, every line one behavior phrased as an
 observable result, boundaries on both sides, error paths specific.
 
-**The cycle log** at `specs/<feature>/tdd/cycle-log.md`: create it with the
-baseline entry only (suite counts, commit SHA). The loop appends to it; you never
-write a cycle entry here.
+**The cycle log** at `FEATURE_DIR/tdd/cycle-log.md`: create it with the baseline
+entry only (suite counts, commit SHA). The loop appends to it; you never write a
+cycle entry here.
 
 **The tasks file**, unless `--no-tasks`. This is where the plan becomes binding:
 
 - For each behavior, ensure `tasks.md` has a test task that precedes the
-  implementation task for the same behavior. Reference the behavior id (for example
-  `[U3]`) in the task text so the two artifacts stay linked.
+  implementation task for the same behavior. Put the behavior id in the task text
+  as `[U3]`, in brackets, on **every** task that behavior covers. This marker is
+  load bearing, not a cross-reference: `/speckit.tdd.run` ticks a task's checkbox
+  only when it can read a behavior id from it, and `/speckit.implement` implements
+  anything still unticked. A behavioral task with no marker gets written twice,
+  the second time test-after.
 - Remove the optionality. spec-kit's task template treats tests as optional; this
   feature's tests are not. Delete the "OPTIONAL" and "only if tests requested"
   qualifiers from the sections you touch, and keep the note that tests must be
@@ -232,8 +243,9 @@ Report:
 2. Coverage of the specification: every acceptance criterion mapped to its
    behaviors, and any criterion you could not turn into a test, with the reason.
    This is the most important part of the report.
-3. What changed in `tasks.md`: tasks added, tasks reordered, optionality removed.
-   List them; a silent edit to a task file is not acceptable.
+3. What changed in `tasks.md`: tasks added, tasks reordered, optionality removed,
+   and which tasks carry a behavior marker against which behavior. List them; a
+   silent edit to a task file is not acceptable.
 4. The suite baseline, and any blocking fact: red suite, missing acceptance runner,
    component with no tests needing characterization first.
 5. Assumptions made and questions still open.

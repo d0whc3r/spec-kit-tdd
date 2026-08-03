@@ -43,8 +43,9 @@ With no input, run the full audit on the current feature.
    refactors, no "while I am here" corrections. The report is the product. An
    auditor that edits the code it grades destroys the only thing that made the
    grade worth reading. The files you may write are
-   `specs/<feature>/tdd/verification.md` and, unless `--no-tasks`, a remediation
-   section appended to `specs/<feature>/tasks.md`.
+   `FEATURE_DIR/tdd/verification.md` and, unless `--no-tasks`, a remediation
+   section appended to `FEATURE_DIR/tasks.md`, where `FEATURE_DIR` is what Phase 0
+   resolved.
 2. **Read cold.** Re-read every test and source file you assess, even ones written
    earlier in this same session. Judge what the file says, not what it was meant to
    say. If you wrote these tests, be explicit in the report that the audit was not
@@ -79,10 +80,14 @@ This command reads two reference files from the installed extension:
   `.specify/extensions/tdd/templates/tdd-test-list-template.md` (the behavior ids,
   states, and cycle-log shape the evidence comes in).
 
-Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
-instead. That path is spec-kit's own override layer, and it is how a project tunes
-an extension's rubric without forking it. Name the file you graded against in the
-report, so a verdict can be compared to the standard that produced it.
+Resolve each one through spec-kit's template stack, first match wins:
+`.specify/templates/overrides/<name>.md`, then
+`.specify/presets/<preset-id>/templates/<name>.md`, then the extension's own copy
+at `.specify/extensions/tdd/templates/<name>.md`. That stack is how a project or
+an installed preset tunes this extension's rubric without forking it, and presets
+sit above extensions precisely so a preset can override this text. Record the
+rubric path you resolved in the report's `standard:` field, so a verdict can be
+compared to the standard that produced it.
 
 ## Workflow
 
@@ -94,15 +99,17 @@ report, so a verdict can be compared to the standard that produced it.
 - Resolve the feature directory with spec-kit's own resolver, not a guess: run
   `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
   `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
-  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
-  then `.specify/feature.json`, and errors when neither is set. If the script is
-  absent or errors, ask which feature to audit. Never infer the feature from the
-  branch name or from file timestamps: auditing the wrong feature produces a
-  confident verdict about work nobody asked about.
-- Read `specs/<feature>/tdd/test-list.md`. If it is absent,
-  the feature was not planned through this extension. You can still audit the
-  tests against `spec.md` (say so, and expect a weaker verdict on ordering), but
-  there is no per-behavior evidence to check.
+  from its JSON. It is an absolute path and it is **not** always under `specs/`,
+  so build every path below from `FEATURE_DIR` rather than from a `specs/<feature>`
+  guess. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`, then
+  `.specify/feature.json`, and errors when neither is set. If the script is absent
+  or errors, ask which feature to audit. Never infer the feature from the branch
+  name or from file timestamps: auditing the wrong feature produces a confident
+  verdict about work nobody asked about.
+- Read `FEATURE_DIR/tdd/test-list.md`. If it is absent, the feature was not planned
+  through this extension. You can still audit the tests against `spec.md` (say so,
+  and expect a weaker verdict on ordering), but there is no per-behavior evidence
+  to check.
 - Read `spec.md` for the criteria and requirements, and `plan.md` for the components
   and boundaries.
 - Run the suite. Record counts and wall time. Separate failures that predate the
@@ -114,7 +121,7 @@ report, so a verdict can be compared to the standard that produced it.
 
 Per the rubric's "Evidence sources", collect all three before judging any of them:
 
-1. **The cycle log** (`specs/<feature>/tdd/cycle-log.md`): what the loop claims,
+1. **The cycle log** (`FEATURE_DIR/tdd/cycle-log.md`): what the loop claims,
    including the red command and output per cycle. Self-reported.
 2. **The git history** for the feature's commits: `git log --stat` over the range,
    and the diffs. This shows the order in which test and source files actually
@@ -139,6 +146,12 @@ pending, an exclusion added to config, or a coverage or mutation threshold lower
 
 Report each with the `file:line` and the before and after, whatever justification
 was given. A weakened existing test is a `FAIL` condition on its own.
+
+Then check `tasks.md` against the test list, because the checkboxes are what the
+rest of the lifecycle trusts. A task ticked `[X]` whose behavior id is not `DONE`
+on the list is a completion claim with no evidence behind it, and a `HIGH` finding.
+A behavioral task still unticked with its behavior `DONE` is the milder inverse:
+report it, since `/speckit.implement` would write that behavior a second time.
 
 ### Phase 3: The smell pass
 
@@ -201,7 +214,7 @@ Build the mapping from `spec.md` to tests, per the rubric's "Traceability" secti
 Assign one verdict from the rubric's table: `PASS`, `PASS_WITH_GAPS`, `FAIL`, or
 `BLOCKED`. State the single most decisive reason on the same line as the verdict.
 
-Write `specs/<feature>/tdd/verification.md` in the rubric's report format:
+Write `FEATURE_DIR/tdd/verification.md` in the rubric's report format:
 frontmatter with the countable facts, the verdict paragraph, the test-first evidence
 table, findings ordered by severity with evidence, mutation results with judgments,
 the traceability table, and an explicit "What was not audited" section. Overwrite
@@ -214,9 +227,8 @@ no report.
 ### Phase 7: Remediation tasks
 
 Unless `--no-tasks`, turn the findings worth acting on into work the lifecycle will
-pick up. Append a `## Phase N: TDD remediation` section to
-`specs/<feature>/tasks.md`, following that file's existing task format and
-continuing its id sequence:
+pick up. Append a `## Phase N: TDD remediation` section to `FEATURE_DIR/tasks.md`,
+following that file's existing task format and continuing its id sequence:
 
 - One task per finding, referencing the finding number and the `file:line`.
 - Phrased as a verifiable change, with the command that proves it done.

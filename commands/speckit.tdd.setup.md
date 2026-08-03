@@ -70,9 +70,13 @@ This command reads one reference file from the installed extension:
   the detection order, the ecosystem reference table, the profile format, the
   verification steps, and the constitution principle text).
 
-Where `.specify/templates/overrides/tdd-stack-profile.md` exists, read that
-instead. That path is spec-kit's own override layer, and it is how a project tunes
-an extension's reference without forking it.
+Resolve it through spec-kit's template stack, first match wins:
+`.specify/templates/overrides/tdd-stack-profile.md`, then
+`.specify/presets/<preset-id>/templates/tdd-stack-profile.md`, then the extension's
+own copy at `.specify/extensions/tdd/templates/tdd-stack-profile.md`. That stack is
+how a project or an installed preset tunes this extension's reference without
+forking it, and presets sit above extensions precisely so a preset can override
+this text.
 
 Read it now, in full, before Phase 1. The ecosystem table there is a starting
 point for detection, and the "Profile format" and "Constitution principle"
@@ -82,8 +86,8 @@ sections are the exact shapes Phase 3 and Phase 4 must produce.
 
 ### Phase 1: Detect
 
-Follow the "Detection order" section of `templates/tdd-stack-profile.md`. In
-summary, and in this order: manifests, then the scripts they define, then the CI
+Follow the "Detection order" section of the stack profile reference resolved above.
+In summary, and in this order: manifests, then the scripts they define, then the CI
 config, then the actual test layout, then the lock file for tool availability.
 
 Record as you go:

@@ -1,5 +1,5 @@
 ---
-description: "Drive the red-green-refactor loop one behavior at a time from the test list: write one failing test, prove it fails for the right reason, make it pass with the smallest change, refactor while green, and record the evidence in specs/<feature>/tdd/cycle-log.md"
+description: "Drive the red-green-refactor loop one behavior at a time from the test list: write one failing test, prove it fails for the right reason, make it pass with the smallest change, refactor while green, record the evidence in the feature's tdd/cycle-log.md, and tick the tasks.md tasks the completed behaviors cover"
 ---
 
 # TDD Run
@@ -8,7 +8,9 @@ Drive the loop. One behavior from the test list, one failing test, the smallest
 change that makes it pass, a refactor step while green, and an evidence entry in
 the cycle log. Then the next behavior.
 
-This is the only command in this extension that writes tests and source code. It
+This is the only command in this extension that writes tests and source code.
+Besides those it writes only the feature's `tdd/test-list.md` and
+`tdd/cycle-log.md`, and the checkboxes of the `tasks.md` tasks it completed. It
 does so under a discipline that is the whole point: **the test is written first, it
 is observed failing, and the failure output is recorded before the implementation
 exists.** A cycle without recorded red evidence is a cycle that proved nothing, and
@@ -30,10 +32,13 @@ modifiers, composable unless stated otherwise:
 
 - A behavior id (for example `U3`, or `U3 U4 U5`): run the loop on exactly those
   behaviors, in the order given, instead of the next pending one.
-- `next` (the default): one cycle on the first `PENDING` behavior in list order,
-  then stop and report.
-- `all`: keep cycling until every behavior is `DONE`, the list is blocked, or an
-  escape hatch fires. Report after each cycle so progress is visible.
+- `all` (the default): keep cycling until every behavior is `DONE`, the list is
+  blocked, or an escape hatch fires. Report after each cycle so progress is
+  visible. This is the default because `/speckit.implement` invokes this command
+  with no arguments through the `before_implement` hook, and it must drive every
+  behavior rather than one.
+- `next`: one cycle on the first `PENDING` behavior in list order, then stop and
+  report. Use it to work behavior by behavior.
 - `outer`: work the next `PENDING` acceptance behavior. Use this to open the outer
   loop before its units, or to close it once they are green.
 - `resume`: a behavior is stuck in `RED` or `GREEN` from an interrupted session.
@@ -43,7 +48,7 @@ modifiers, composable unless stated otherwise:
   and a fast suite. Only when explicitly asked.
 - `--no-commit`: run the cycles but leave the changes uncommitted.
 
-With no input, run one cycle on the next pending behavior.
+With no input, run `all`.
 
 ## Hard Rules
 
@@ -92,9 +97,12 @@ This command reads three reference files from the installed extension:
   `.specify/extensions/tdd/templates/tdd-stack-profile.md` (what each profile
   command means, and how the loop degrades when a capability is missing).
 
-Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
-instead. That path is spec-kit's own override layer, and it is how a project tunes
-an extension's discipline without forking it.
+Resolve each one through spec-kit's template stack, first match wins:
+`.specify/templates/overrides/<name>.md`, then
+`.specify/presets/<preset-id>/templates/<name>.md`, then the extension's own copy
+at `.specify/extensions/tdd/templates/<name>.md`. That stack is how a project or
+an installed preset tunes this extension's discipline without forking it, and
+presets sit above extensions precisely so a preset can override this text.
 
 ## Workflow
 
@@ -106,14 +114,26 @@ an extension's discipline without forking it.
 - Resolve the feature directory with spec-kit's own resolver, not a guess: run
   `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
   `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
-  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
-  then `.specify/feature.json`, and errors when neither is set. If the script is
-  absent or errors, ask which feature to work on. Never infer the feature from the
-  branch name or from file timestamps.
-- Read `specs/<feature>/tdd/test-list.md`. If absent, stop: run
-  `/speckit.tdd.plan` first.
-- Read `spec.md` for the criteria the behaviors trace to. When a test and the code
-  disagree later, this is what decides which is wrong.
+  from its JSON. It is an absolute path and it is **not** always under `specs/`,
+  so build every path below from `FEATURE_DIR` rather than from a `specs/<feature>`
+  guess. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`, then
+  `.specify/feature.json`, and errors when neither is set. If the script is absent
+  or errors, ask which feature to work on. Never infer the feature from the branch
+  name or from file timestamps.
+- Read `FEATURE_DIR/tdd/test-list.md`. If absent, stop: run `/speckit.tdd.plan`
+  first, and say that the implementation phase must not continue until the list
+  exists. That message matters when this command was invoked by the
+  `before_implement` hook: without it the caller writes the feature test-after.
+- Read `FEATURE_DIR/tasks.md` and build the map from behavior id to task id.
+  `/speckit.tdd.plan` writes the behavior id into the task text (for example
+  `[U3]`), and that marker is the only link between the two files. Phase 6 needs
+  it, and a task with no marker is not this command's work. If `tasks.md` is absent,
+  or no task carries a marker (the list was planned with `--no-tasks`), skip the
+  ticking in Phase 6 and say so in the report: whoever runs `/speckit.implement`
+  next needs to know it will treat the loop's work as still open.
+- Read `spec.md` (`FEATURE_SPEC` from the same JSON) for the criteria the behaviors
+  trace to. When a test and the code disagree later, this is what decides which is
+  wrong.
 - Read the exemplar test file named in the profile. Every test you write must look
   like it belongs next to that file: same naming, same assertion style, same
   fixture approach, same double library.
@@ -214,15 +234,27 @@ inventing a change to look thorough.
 
 ### Phase 6: Record and commit
 
-Append one entry to `specs/<feature>/tdd/cycle-log.md` in the shape given by
-`templates/tdd-test-list-template.md`: the test file and name, the red command and
-its output, what made it green and the resulting suite counts, what the refactor
-changed, and the commit SHA. Any deviation (a split step, a revert, a
-test-after admission, a pre-existing red) goes in the entry's notes. The log is
-append only: never edit a past entry.
+Append one entry to `FEATURE_DIR/tdd/cycle-log.md` in the shape given by the test
+list template: the test file and name, the red command and its output, what made it
+green and the resulting suite counts, what the refactor changed, and the commit
+SHA. Any deviation (a split step, a revert, a test-after admission, a pre-existing
+red) goes in the entry's notes. The log is append only: never edit a past entry.
 
 Update the behavior's row in the test list: state `DONE`, and the `test` column
 filled with the test's file and name.
+
+Then tick the work off in `FEATURE_DIR/tasks.md`, using the map from Phase 0:
+
+- Mark `[X]` every open task whose text references this behavior id, once the
+  behavior is `DONE`. A task that names several behaviors is ticked only when all
+  of them are `DONE`.
+- Touch nothing else. Never tick a task with no behavior marker, never tick one
+  whose behavior is `RED`, `GREEN`, `BLOCKED`, or `BASELINE`, and never renumber or
+  reword a task.
+- This is not bookkeeping. `/speckit.implement` decides what to implement from the
+  checkboxes alone, so an unticked task the loop already drove is a second
+  implementation written over freshly test-driven code. Ticking it is what makes
+  the handoff safe.
 
 Commit at green, per the playbook's cadence: the test and its implementation
 together, structural refactors as their own commit, message in the repository's
@@ -232,8 +264,8 @@ so in the report.
 
 ### Phase 7: Continue or report
 
-With `all`, return to Phase 1 for the next behavior. With `next` or explicit ids,
-stop when they are done.
+With `all` (the default), return to Phase 1 for the next behavior. With `next` or
+explicit ids, stop when they are done.
 
 When an outer-loop behavior's units are all `DONE`, run its acceptance test: that
 is how the outer loop closes. If it is still red with green units, the units are
@@ -243,17 +275,18 @@ the acceptance test to match.
 Report at the end:
 
 1. Behaviors completed this session, each with its red-to-green evidence in one
-   line, plus the commits, plus the `tasks.md` task ids those behaviors cover. The
-   loop does not tick task checkboxes, so naming them is what stops
-   `/speckit.implement` from redoing work the loop already finished.
-2. Behaviors added to the list mid-loop, and why.
-3. The suite state now: counts and wall time.
-4. Anything blocked or deviating: splits, reverts, test-after admissions,
+   line, plus the commits.
+2. The `tasks.md` tasks ticked, by id, and the open tasks that carry no behavior
+   marker. Those are the non-behavioral work (scaffolding, configuration, wiring)
+   that this loop deliberately left for `/speckit.implement`.
+3. Behaviors added to the list mid-loop, and why.
+4. The suite state now: counts and wall time.
+5. Anything blocked or deviating: splits, reverts, test-after admissions,
    pre-existing reds, unrelated problems noticed and deliberately not fixed.
-5. What remains on the list, and which behavior is next.
-6. Next step: `/speckit.tdd.run` again for the next behavior, or
-   `/speckit.tdd.verify` once the list is `DONE`, to audit the discipline and the
-   strength of the tests from cold context.
+6. What remains on the list, and which behavior is next.
+7. Next step: `/speckit.tdd.run` again if behaviors remain, `/speckit.implement`
+   for the unmarked tasks, then `/speckit.tdd.verify` once the list is `DONE`, to
+   audit the discipline and the strength of the tests from cold context.
 
 Report honestly. A session that completed two cycles and hit a blocker is a better
 outcome than one that reports six cycles it cannot show evidence for.
