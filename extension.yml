@@ -11,7 +11,11 @@ extension:
   license: MIT
 
 requires:
-  speckit_version: ">=0.2.0"
+  # 0.8.1 is the first release that resolves the feature directory from
+  # SPECIFY_FEATURE_DIRECTORY or .specify/feature.json, and 0.11.9 the first that
+  # actually invokes a mandatory hook instead of only printing its directive. The
+  # commands and the before_implement hook below depend on both.
+  speckit_version: ">=0.11.9"
 
 provides:
   commands:
@@ -23,7 +27,7 @@ provides:
       description: "Derive the feature's test list from spec.md and plan.md into specs/<feature>/tdd/test-list.md (outer acceptance behaviors, inner unit behaviors, each traced to an acceptance criterion) and make the test tasks in tasks.md mandatory and correctly ordered"
     - name: speckit.tdd.run
       file: commands/speckit.tdd.run.md
-      description: "Drive the red-green-refactor loop one behavior at a time from the test list: write one failing test, prove it fails for the right reason, make it pass with the smallest change, refactor while green, and record the evidence in specs/<feature>/tdd/cycle-log.md"
+      description: "Drive the red-green-refactor loop one behavior at a time from the test list: write one failing test, prove it fails for the right reason, make it pass with the smallest change, refactor while green, record the evidence in the feature's tdd/cycle-log.md, and tick the tasks.md tasks the completed behaviors cover"
     - name: speckit.tdd.verify
       file: commands/speckit.tdd.verify.md
       description: "Audit the feature's TDD discipline and test strength from cold context: test-first evidence in git history, red-phase evidence, test-smell rubric, mutation testing on the changed files, and acceptance-criteria coverage, then write specs/<feature>/tdd/verification.md with a verdict and remediation tasks"
@@ -34,11 +38,15 @@ hooks:
     optional: true
     prompt: "Derive the TDD test list and make the test tasks in tasks.md mandatory?"
     description: "Generate specs/<feature>/tdd/test-list.md from spec.md and plan.md, then reorder tasks.md so every behavior has a failing test before its implementation"
+  # Not optional, on purpose. spec-kit only waits for a hook whose optional flag
+  # is false; an optional pre-hook prints its offer and /speckit.implement writes
+  # the whole feature in the same run, which is the exact failure this hook
+  # exists to prevent. Set enabled: false in .specify/extensions.yml to opt out.
   before_implement:
     command: speckit.tdd.run
-    optional: true
+    optional: false
     prompt: "Drive the behavioral tasks through the red-green-refactor loop first?"
-    description: "Run the loop over the behaviors on specs/<feature>/tdd/test-list.md, one failing test at a time with the red recorded, then use /speckit.implement for the tasks that are not behavior changes"
+    description: "Run the loop over every behavior on the feature's tdd/test-list.md, one failing test at a time with the red recorded, ticking the tasks each behavior completes so /speckit.implement then covers only the work that is not a behavior change"
   after_implement:
     command: speckit.tdd.verify
     optional: true
