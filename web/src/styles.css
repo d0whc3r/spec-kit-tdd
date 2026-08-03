@@ -1,0 +1,1145 @@
+/* TDD Extension landing page.
+   Hand-authored, no build step, no external dependencies. Kept in sync with
+   the docs/ wiki by the maintain-docs skill. */
+
+:root {
+  --bg: #0d1117;
+  --bg-alt: #11161d;
+  --surface: #161b22;
+  --border: #283039;
+  --text: #e6edf3;
+  --text-muted: #9aa7b4;
+  --accent: #4c8dff;
+  --accent-strong: #6aa3ff;
+  --code-bg: #0a0e14;
+  --radius: 12px;
+  --maxw: 1080px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ffffff;
+    --bg-alt: #f6f8fa;
+    --surface: #ffffff;
+    --border: #d8dee4;
+    --text: #1f2328;
+    --text-muted: #59636e;
+    --accent: #0a5cff;
+    --accent-strong: #0a4ed6;
+    --code-bg: #f6f8fa;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.1em 0.4em;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Universal copy button injected into every [data-copy] pre by script.js. */
+.pre-wrap {
+  position: relative;
+}
+
+.pre-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+
+.pre-wrap:hover .pre-copy,
+.pre-copy:focus {
+  opacity: 1;
+}
+
+.pre-copy:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.pre-copy.is-copied {
+  opacity: 1;
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Tabs (install methods, example outputs). */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tabs-wrap {
+  margin-bottom: 16px;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.tab:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.tab.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.is-active {
+  display: block;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* Header / nav */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.brand-version {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-cta {
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 8px;
+  color: var(--text) !important;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.nav-toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: 0.2s;
+}
+
+/* Hero */
+.hero {
+  padding: 88px 0 72px;
+  background: radial-gradient(
+    1000px 400px at 70% -10%,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    transparent
+  );
+}
+
+.hero-inner {
+  max-width: 820px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  margin: 0 0 12px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.1;
+  margin: 0 0 20px;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 680px;
+  margin: 0 0 32px;
+}
+
+.install {
+  margin-bottom: 24px;
+  max-width: 760px;
+}
+
+.install-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.install-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.install-hint {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-strong);
+}
+
+.btn-ghost {
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+}
+
+.hero-badges {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-badges li {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+/* Sections */
+.section {
+  padding: 72px 0;
+}
+
+.section-alt {
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin: 0 0 16px;
+  letter-spacing: -0.01em;
+}
+
+.section-lede {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 720px;
+  margin: 0 0 36px;
+}
+
+.note {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 20px;
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  gap: 20px;
+}
+
+/* minmax(0, 1fr) lets tracks shrink below their content's min size, so a long
+   URL inside a <pre> scrolls within its card instead of widening the grid. */
+.cards-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cards-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card pre {
+  margin: 14px 0 8px;
+}
+
+/* Install options: stacked full-width cards so the long URLs get room. */
+.install-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Table */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.cmd-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.cmd-table th,
+.cmd-table td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.cmd-table thead th {
+  background: var(--bg-alt);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.cmd-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.cmd-table td:nth-child(4) {
+  color: var(--text-muted);
+}
+
+/* Steps */
+.steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+
+.steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 60px;
+}
+
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.steps h3 {
+  margin: 4px 0 10px;
+  font-size: 1.2rem;
+}
+
+.steps p {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.steps pre {
+  margin: 0 0 12px;
+}
+
+/* Steps aside note */
+.step-aside {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+  margin: 0;
+}
+
+/* Example (input -> output). Command tabs sit on top and drive the output
+   pane; the input pane stays constant. */
+.example-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.example-tabs {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+
+.example-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 18px;
+  padding: 20px;
+  align-items: start;
+}
+
+.example-arrow {
+  align-self: center;
+  color: var(--accent);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.example-pane {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.example-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.example-head code {
+  font-size: 0.78rem;
+}
+
+.example-tag {
+  flex: none;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.example-tag-out {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.example-pane pre {
+  font-size: 0.8rem;
+  margin: 0;
+  max-height: 380px;
+}
+
+.example-note {
+  margin: 12px 0 0;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Input file tabs (spec.md / plan.md) inside the left example pane. */
+.example-input-tabs {
+  margin-bottom: 12px;
+}
+
+/* "View full file" button, right-aligned in the example head. */
+.md-full-btn {
+  margin-left: auto;
+  flex: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.md-full-btn:hover,
+.md-full-btn:focus-visible {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Rendered markdown excerpt inside a pane (replaces the <pre> fallback). */
+.md-excerpt {
+  max-height: 380px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  padding: 16px 20px;
+  font-size: 0.85rem;
+}
+
+/* Shared markdown typography for excerpts and the full-file viewer. */
+.md-body {
+  color: var(--text);
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.md-body > :first-child {
+  margin-top: 0;
+}
+
+.md-body > :last-child {
+  margin-bottom: 0;
+}
+
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4 {
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+  font-weight: 700;
+}
+
+.md-body h1 {
+  font-size: 1.5rem;
+}
+
+.md-body h2 {
+  font-size: 1.25rem;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+.md-body h3 {
+  font-size: 1.05rem;
+}
+
+.md-body h4 {
+  font-size: 0.95rem;
+}
+
+.md-body p,
+.md-body ul,
+.md-body ol,
+.md-body blockquote,
+.md-body table {
+  margin: 0 0 1em;
+}
+
+.md-body ul,
+.md-body ol {
+  padding-left: 1.4em;
+}
+
+.md-body li + li {
+  margin-top: 0.25em;
+}
+
+.md-body blockquote {
+  margin-left: 0;
+  padding: 0.2em 1em;
+  border-left: 3px solid var(--accent);
+  color: var(--text-muted);
+}
+
+.md-body a {
+  color: var(--accent);
+}
+
+.md-body table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  font-size: 0.92em;
+}
+
+.md-body th,
+.md-body td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.md-body th {
+  background: var(--bg-alt);
+  font-weight: 700;
+}
+
+.md-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+/* GitHub-style task lists (the checklist artifact). marked emits a bare
+   <li><input type="checkbox"> with no marker class, so target the checkbox. */
+.md-body li:has(> input[type="checkbox"]) {
+  list-style: none;
+}
+
+.md-body ul:has(> li > input[type="checkbox"]) {
+  padding-left: 0.2em;
+}
+
+.md-body li > input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+/* Mermaid diagrams rendered from ```mermaid code blocks. */
+.md-body .mermaid-rendered {
+  position: relative;
+  margin: 0 0 1em;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+  overflow: hidden;
+  text-align: center;
+}
+
+.md-body .mermaid-rendered.is-zoomed {
+  cursor: grab;
+  touch-action: none;
+}
+
+.md-body .mermaid-rendered.is-panning {
+  cursor: grabbing;
+}
+
+.md-body .mermaid-rendered svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Pan/zoom toolbar injected into each diagram by script.js. */
+.mermaid-zoom {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.mermaid-rendered:hover .mermaid-zoom,
+.mermaid-rendered:focus-within .mermaid-zoom,
+.mermaid-rendered.is-zoomed .mermaid-zoom {
+  opacity: 1;
+}
+
+.mermaid-zoom-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.mermaid-zoom-btn:hover,
+.mermaid-zoom-btn:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Full-file markdown viewer modal. */
+body.md-modal-open {
+  overflow: hidden;
+}
+
+.md-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.md-modal[hidden] {
+  display: none;
+}
+
+.md-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #000 60%, transparent);
+}
+
+.md-modal-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(820px, 100%);
+  max-height: min(86vh, 900px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.md-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+
+.md-modal-title {
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.md-modal-gh {
+  margin-left: auto;
+  flex: none;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.md-modal-close {
+  flex: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.md-modal-close:hover,
+.md-modal-close:focus-visible {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.md-modal-body {
+  padding: 24px 28px;
+  overflow: auto;
+}
+
+.md-modal-body:focus {
+  outline: none;
+}
+
+.md-loading {
+  color: var(--text-muted);
+}
+
+/* Callout */
+.callout {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  background: var(--surface);
+}
+
+.callout-error {
+  border-left: 4px solid #e5534b;
+}
+
+.callout-title {
+  margin: 0 0 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.callout pre {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+/* Flow diagram */
+.flow {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* FAQ */
+.faq {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.faq details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 20px;
+}
+
+/* The title flows as normal text so inline <code> sits naturally; the marker
+   is positioned out of flow rather than as a flex sibling. */
+.faq summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 14px 32px 14px 0;
+  list-style: none;
+  position: relative;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.faq details[open] summary::after {
+  content: "\2212";
+}
+
+.faq details p {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-alt);
+  padding: 40px 0;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-brand {
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.footer-tag {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: flex-start;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 24px 16px;
+    display: none;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links li {
+    padding: 6px 0;
+  }
+
+  .nav-cta {
+    display: inline-block;
+    margin-top: 6px;
+  }
+
+  .cards-3,
+  .cards-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .example-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .example-arrow {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+
+  .hero {
+    padding: 56px 0 48px;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+}

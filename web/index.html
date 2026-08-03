@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TDD Extension for Spec Kit</title>
+    <meta
+      name="description"
+      content="A Spec Kit extension that makes the implementation phase test-driven in any language: a test list from the acceptance criteria, a red-green-refactor loop with recorded evidence, and mutation-checked test strength."
+    />
+    <meta property="og:title" content="TDD Extension for Spec Kit" />
+    <meta
+      property="og:description"
+      content="A red-green-refactor loop for the spec-kit lifecycle, in any language. Recorded red evidence, and an audit that checks whether the tests would actually catch a bug."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://d0whc3r.github.io/spec-kit-tdd/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">/</span>
+          <span>TDD Extension</span>
+          <span class="brand-version">v0.1.0</span>
+        </a>
+        <button
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="nav-links"
+          aria-label="Toggle navigation"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#what">What it does</a></li>
+          <li><a href="#commands">Commands</a></li>
+          <li><a href="#examples">Examples</a></li>
+          <li><a href="#start">Get started</a></li>
+          <li><a href="#install-help">Install help</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li>
+            <a class="nav-cta" href="https://github.com/d0whc3r/spec-kit-tdd">GitHub</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="container hero-inner">
+          <p class="eyebrow">A Spec Kit extension</p>
+          <h1>A green suite is not evidence. A recorded red is.</h1>
+          <p class="lede">
+            TDD Extension makes the implementation phase test-driven in any language. It turns
+            acceptance criteria into a test list, drives red-green-refactor one behavior at a time
+            while recording the failure that preceded each fix, then audits the result from cold
+            context: was the test really first, does it assert behavior, and would it actually catch
+            a bug.
+          </p>
+
+          <div class="install">
+            <div class="install-head">
+              <span class="install-label">Install with Spec Kit</span>
+              <div class="tabs" role="tablist" aria-label="Install method">
+                <button
+                  id="tab-install-direct"
+                  class="tab is-active"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-install-direct"
+                >
+                  Direct install
+                </button>
+                <button
+                  id="tab-install-catalog"
+                  class="tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-install-catalog"
+                >
+                  Via catalog
+                </button>
+              </div>
+            </div>
+
+            <div
+              id="panel-install-direct"
+              class="tab-panel is-active"
+              role="tabpanel"
+              aria-labelledby="tab-install-direct"
+            >
+              <pre data-copy><code>specify extension add tdd \
+  --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v0.1.0/tdd-0.1.0.zip</code></pre>
+              <p class="install-hint">
+                Works with zero configuration. This is the most reliable path and the same one you
+                use to pin a version.
+              </p>
+            </div>
+
+            <div
+              id="panel-install-catalog"
+              class="tab-panel"
+              role="tabpanel"
+              aria-labelledby="tab-install-catalog"
+              hidden
+            >
+              <pre data-copy><code>specify extension catalog add \
+  https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json \
+  --name community --install-allowed
+specify extension add tdd</code></pre>
+              <p class="install-hint">
+                Prefer installing and updating by name? Approve the community catalog once, then
+                <code>add</code> and <code>update</code> resolve <code>tdd</code> automatically. See
+                <a href="#install-help">install help</a> for why this is needed.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#start">Get started</a>
+            <a class="btn btn-ghost" href="#examples">See an example</a>
+            <a class="btn btn-ghost" href="https://github.com/d0whc3r/spec-kit-tdd/wiki"
+              >Read the docs</a
+            >
+          </div>
+
+          <ul class="hero-badges">
+            <li>Four commands</li>
+            <li>Requires Spec Kit &gt;= 0.2.0</li>
+            <li>MIT licensed</li>
+            <li>Any language</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="what">
+        <div class="container">
+          <h2>Why this exists</h2>
+          <p class="section-lede">
+            Spec-driven development gets the specification right and then hands it to an agent that
+            writes the code and its tests in the same pass. That is where the guarantee leaks. Tests
+            written next to the code they check tend to pass while proving very little, and coverage
+            agrees with them, because every one of those tests executes the line. The suite goes
+            green and the feature reads as done.
+          </p>
+          <div class="cards cards-3">
+            <article class="card">
+              <h3>Ordering, recorded</h3>
+              <p>
+                Each cycle writes one test, runs it, and records the real failure output before the
+                implementation exists. A test that fails on a typo is not a valid red, and a test
+                that passes immediately gets a deliberate-mutant check. The audit re-checks that
+                record against git history rather than trusting it.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Strength, measured</h3>
+              <p>
+                Coverage counts execution. Mutation testing asks whether a bug would have been
+                caught, which is the only mechanical way to expose a tautological test that reads
+                fine. It runs scoped to the files the feature changed, and degrades to deliberate
+                mutants where the ecosystem has no tool.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Graded by someone else</h3>
+              <p>
+                A loop cannot grade itself: the session that wrote the tests fills every gap from
+                memory. <code>/speckit.tdd.verify</code> runs cold, fails closed on missing
+                evidence, and never fixes what it finds. Findings become remediation tasks, not
+                silent edits.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-alt" id="commands">
+        <div class="container">
+          <h2>Four commands</h2>
+          <p class="section-lede">
+            One per moment in the lifecycle, each with its own write boundary.
+            <code>/speckit.tdd.run</code> is the only one that writes tests or source. The command
+            that grades the work is deliberately not the command that does it.
+          </p>
+
+          <div class="table-wrap">
+            <table class="cmd-table">
+              <thead>
+                <tr>
+                  <th>Command</th>
+                  <th>What it does</th>
+                  <th>Writes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/speckit.tdd.setup</code></td>
+                  <td>
+                    Detects every test stack from the manifests, scripts, CI config, and test
+                    layout, then <strong>proves each command by running it</strong>. Once per
+                    repository. Also proposes the TDD principle for your project constitution.
+                  </td>
+                  <td><code>.specify/memory/tdd-profile.md</code></td>
+                </tr>
+                <tr>
+                  <td><code>/speckit.tdd.plan</code></td>
+                  <td>
+                    Turns acceptance criteria into outer-loop behaviors and plan components into
+                    inner-loop behaviors, each traced to what it serves. Then removes the
+                    optionality from the test tasks in <code>tasks.md</code> and orders each one
+                    before the implementation it covers.
+                  </td>
+                  <td>
+                    <code>specs/&lt;feature&gt;/tdd/test-list.md</code>,
+                    <code>tasks.md</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>/speckit.tdd.run</code></td>
+                  <td>
+                    The loop. One failing test, red proven and recorded, smallest green, full suite,
+                    refactor while green, one commit. Stops and reports rather than improvising when
+                    the suite is red at baseline or a criterion turns out ambiguous.
+                  </td>
+                  <td>tests, source, <code>specs/&lt;feature&gt;/tdd/cycle-log.md</code></td>
+                </tr>
+                <tr>
+                  <td><code>/speckit.tdd.verify</code></td>
+                  <td>
+                    The audit, from cold context. Test-first evidence in git history, the test-smell
+                    rubric, mutation on the changed files, criteria coverage. Verdict: PASS,
+                    PASS_WITH_GAPS, FAIL, or BLOCKED.
+                  </td>
+                  <td><code>specs/&lt;feature&gt;/tdd/verification.md</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="note">
+            Two hooks fire automatically if you leave them enabled, and both ask first:
+            <code>after_tasks</code> runs <code>plan</code>, <code>after_implement</code> runs
+            <code>verify</code>. Those are the two moments the discipline is most often skipped.
+          </p>
+          <p class="note">
+            Modifiers: <code>refresh</code> re-detects or re-derives, <code>all</code> keeps the
+            loop cycling, <code>outer</code> works the next acceptance behavior,
+            <code>tcr</code> switches to <code>test &amp;&amp; commit || revert</code>,
+            <code>quick</code> and <code>deep</code> set the audit's depth, and
+            <code>branch</code> audits everything the current branch changed.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="examples">
+        <div class="container">
+          <h2>See it in action</h2>
+          <p class="section-lede">
+            One real feature in a TypeScript service: session expiry plus scoping the order list to
+            the requesting user. Three acceptance criteria, eleven cycles. On the left is what the
+            loop recorded; on the right is what the cold audit found. Everything is rendered
+            straight from the files in the
+            <a href="https://github.com/d0whc3r/spec-kit-tdd/tree/main/examples">examples folder</a
+            >. Pick a view, read the excerpt, and open the full version.
+          </p>
+
+          <div class="example-card">
+            <div class="example-tabs tabs" role="tablist" aria-label="Audit output">
+              <button
+                id="tab-ex-verdict"
+                class="tab is-active"
+                role="tab"
+                aria-selected="true"
+                aria-controls="panel-ex-verdict"
+              >
+                The verdict
+              </button>
+              <button
+                id="tab-ex-mutants"
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panel-ex-mutants"
+              >
+                The mutant that survived
+              </button>
+            </div>
+
+            <div class="example-body">
+              <div class="example-pane">
+                <div class="example-head">
+                  <span class="example-tag">Loop output</span>
+                  <code>cycle-log.md</code>
+                  <button
+                    class="md-full-btn"
+                    type="button"
+                    data-md-full="examples/specs/003-user-auth/tdd/cycle-log.md"
+                    data-md-title="specs/003-user-auth/tdd/cycle-log.md"
+                  >
+                    View full file
+                  </button>
+                </div>
+                <pre
+                  class="md-source"
+                ><code>## Cycle 3: U2 accepts a token expiring exactly at the current instant
+
+- test: `src/auth/session.test.ts::accepts a token expiring now` (new)
+- red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
+  -> `AssertionError: expected 'expired' to be undefined` (1 failed)
+- green: `src/auth/session.ts:31` changed `<` to `<=`. Suite -> 126 passed
+- refactor: extracted `isExpired(claims, now)`; suite re-run green
+- commit: `9c2b117` (behavior), `5ee0a30` (structure)
+- note: U1 alone passed with both `<` and `<=`, which is exactly why the
+  boundary needed its own behavior on the list.</code></pre>
+                <p class="example-note">
+                  A real command, its real failure output, recorded before the fix existed. Behavior
+                  and structure land as separate commits.
+                </p>
+              </div>
+
+              <div class="example-arrow" aria-hidden="true">&rarr;</div>
+
+              <div class="example-pane">
+                <div
+                  id="panel-ex-verdict"
+                  class="tab-panel is-active"
+                  role="tabpanel"
+                  aria-labelledby="tab-ex-verdict"
+                >
+                  <div class="example-head">
+                    <span class="example-tag example-tag-out">Audit</span>
+                    <code>specs/003-user-auth/tdd/verification.md</code>
+                    <button
+                      class="md-full-btn"
+                      type="button"
+                      data-md-full="examples/specs/003-user-auth/tdd/verification.md"
+                      data-md-title="specs/003-user-auth/tdd/verification.md"
+                    >
+                      View full file
+                    </button>
+                  </div>
+                  <pre class="md-source"><code>---
+feature: 003-user-auth
+verdict: PASS_WITH_GAPS
+behaviors: 12
+proven: 9
+likely: 2
+test_after: 0
+high_smells: 0
+criteria_covered: 3
+mutation_score: 87
+mutants_survived: 3
+---</code></pre>
+                  <p class="example-note">
+                    Two behaviors are <code>LIKELY</code> rather than <code>PROVEN</code>: their
+                    commits were amended, so git history can no longer corroborate that the test
+                    came first. The log says it did. The audit will not upgrade that on the log's
+                    word alone.
+                  </p>
+                </div>
+
+                <div
+                  id="panel-ex-mutants"
+                  class="tab-panel"
+                  role="tabpanel"
+                  aria-labelledby="tab-ex-mutants"
+                  hidden
+                >
+                  <div class="example-head">
+                    <span class="example-tag example-tag-out">Audit</span>
+                    <code>specs/003-user-auth/tdd/verification.md</code>
+                    <button
+                      class="md-full-btn"
+                      type="button"
+                      data-md-full="examples/specs/003-user-auth/tdd/verification.md"
+                      data-md-title="specs/003-user-auth/tdd/verification.md"
+                    >
+                      View full file
+                    </button>
+                  </div>
+                  <pre class="md-source"><code>| Mutant | Behavior | Survived | Judgment |
+| ------ | -------- | -------- | -------- |
+| `session.ts:31` `<=` to `<` | U2 | No | Caught by U2, boundary pinned |
+| `repository.ts:41` predicate inverted on the empty path | U8 | Yes | **Real gap.** U8 passes with the filter inverted: empty either way |
+| `session.ts:44` changed a debug log string | none | Yes | Equivalent mutant, no observable behavior |</code></pre>
+                  <p class="example-note">
+                    <code>U8</code> asserts that no orders yields <code>[]</code> rather than
+                    <code>null</code>, which is correct, and it passes even with the user filter
+                    inverted because the result is empty either way. The line runs, so coverage is
+                    satisfied. This finding is the reason the audit exists.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="note">
+            The snippets above are excerpts. Hit <strong>View full file</strong> to read the whole
+            artifact rendered in place, or browse every file on the
+            <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki/Examples">Examples page</a>
+            in the wiki.
+          </p>
+        </div>
+      </section>
+
+      <!-- In-page markdown viewer. Populated and toggled by src/markdown.ts; hidden
+           and inert until a "View full file" button is pressed. -->
+      <div
+        id="md-modal"
+        class="md-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="md-modal-title"
+        hidden
+      >
+        <div class="md-modal-backdrop" data-md-close></div>
+        <div class="md-modal-dialog" role="document">
+          <header class="md-modal-head">
+            <code id="md-modal-title" class="md-modal-title"></code>
+            <a id="md-modal-gh" class="md-modal-gh" href="#" target="_blank" rel="noopener">
+              Open on GitHub
+            </a>
+            <button class="md-modal-close" type="button" data-md-close aria-label="Close">
+              &times;
+            </button>
+          </header>
+          <div id="md-modal-body" class="md-modal-body md-body" tabindex="-1"></div>
+        </div>
+      </div>
+
+      <section class="section section-alt" id="start">
+        <div class="container">
+          <h2>Get started in five minutes</h2>
+          <ol class="steps">
+            <li>
+              <h3>Install the extension</h3>
+              <p>
+                You need Spec Kit &gt;= 0.2.0 initialized (<code>specify init</code>), a git
+                repository, and a working test runner. Install directly from the latest release;
+                this needs no catalog setup and is the recommended path:
+              </p>
+              <pre data-copy><code>specify extension add tdd \
+  --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v0.1.0/tdd-0.1.0.zip</code></pre>
+              <p>Confirm it registered:</p>
+              <pre data-copy><code>cat .specify/extensions/.registry   # 'tdd' entry present
+ls .specify/extensions/tdd          # extension files present</code></pre>
+              <p class="step-aside">
+                Prefer <code>specify extension add tdd</code> by name? That needs the community
+                catalog approved first. See <a href="#install-help">install help</a>.
+              </p>
+            </li>
+            <li>
+              <h3>Set up the stack, once</h3>
+              <p>
+                This detects every stack in the repository and runs each candidate command to prove
+                it works. Read the report: the useful part is usually negative. A suite that is
+                already red, no way to run a single test, or a package with no runner each change
+                what you do next.
+              </p>
+              <pre data-copy><code>/speckit.tdd.setup</code></pre>
+            </li>
+            <li>
+              <h3>Derive the test list</h3>
+              <p>
+                After the usual <code>/speckit.specify</code>, <code>/speckit.plan</code>, and
+                <code>/speckit.tasks</code>. Then read
+                <code>specs/&lt;feature&gt;/tdd/test-list.md</code>. This is the cheapest moment in
+                the whole feature to catch a missing boundary case or a criterion nobody can test.
+              </p>
+              <pre data-copy><code>/speckit.tdd.plan</code></pre>
+            </li>
+            <li>
+              <h3>Run the loop, then audit it cold</h3>
+              <p>
+                One cycle at a time, or <code>all</code> to keep going. Then run the audit in a
+                <strong>fresh session</strong>: its whole value is having no memory of the loop, so
+                it reads what the tests actually say.
+              </p>
+              <pre data-copy><code>/speckit.tdd.run all
+/speckit.tdd.verify</code></pre>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="workflow">
+        <div class="container">
+          <h2>How it flows</h2>
+          <p class="section-lede">
+            Every artifact is plain Markdown committed alongside the code it describes. No database,
+            no index file, no runtime. The loop never pushes, never merges, and never commits on
+            red.
+          </p>
+          <pre
+            class="flow"
+          ><code>spec-kit core                     the extension                     artifacts
+-------------                     -------------                     ---------
+
+(once per repo)             --&gt;  /speckit.tdd.setup    --&gt;  .specify/memory/tdd-profile.md
+                                 detect + prove             constitution principle (with approval)
+
+/speckit.specify
+/speckit.plan
+/speckit.tasks              --&gt;  /speckit.tdd.plan     --&gt;  tdd/test-list.md (behaviors PENDING)
+                                 (after_tasks hook)         tdd/cycle-log.md (baseline)
+      |                                                     tasks.md (tests mandatory, ordered)
+      v
+                                 /speckit.tdd.run      --&gt;  tests + source
+                                 red -&gt; green               tdd/cycle-log.md (one entry per cycle)
+                                 -&gt; refactor -&gt; commit      tdd/test-list.md (states -&gt; DONE)
+
+/speckit.implement          --&gt;  /speckit.tdd.verify   --&gt;  tdd/verification.md (verdict)
+                                 (after_implement hook)     tasks.md (remediation phase)</code></pre>
+          <p class="note">
+            The outer loop is the feature's acceptance criteria, measured in hours. The inner loop
+            is the components beneath them, measured in minutes. The acceptance test is written
+            first and stays red until the feature works end to end, because it is the only test that
+            fails when every unit is individually right and the composition is wrong.
+          </p>
+        </div>
+      </section>
+
+      <section class="section section-alt" id="install-help">
+        <div class="container">
+          <h2>Install help</h2>
+          <p class="section-lede">
+            If <code>specify extension add tdd</code> stops with the error below, this is the fix.
+            It is expected behavior, not a broken release.
+          </p>
+
+          <div class="callout callout-error">
+            <p class="callout-title">The error you may see</p>
+            <pre><code>Error: 'tdd' is available in the 'community' catalog but installation
+is not allowed from that catalog.
+
+To enable installation, add 'tdd' to an approved catalog
+(install_allowed: true) in .specify/extension-catalogs.yml.</code></pre>
+          </div>
+
+          <p>
+            Spec Kit ships the community catalog as <strong>discovery only</strong>. It carries
+            <code>install_allowed: false</code> by design, so the CLI can list community extensions
+            but will not install one until you opt in. You have two ways to opt in.
+          </p>
+
+          <div class="install-options">
+            <article class="card">
+              <h3>Option A: Direct install (recommended)</h3>
+              <p>
+                Install straight from the release archive. No catalog config, always works, and it
+                is the only way to pin a specific version.
+              </p>
+              <pre data-copy><code>specify extension add tdd \
+  --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v0.1.0/tdd-0.1.0.zip</code></pre>
+              <p class="example-note">
+                To update later, run the same command with a newer version URL.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Option B: Approve the community catalog</h3>
+              <p>
+                Do this once if you want to install and update by name. It adds the catalog with
+                <code>install_allowed: true</code> to <code>.specify/extension-catalogs.yml</code>.
+              </p>
+              <pre data-copy><code>specify extension catalog add \
+  https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json \
+  --name community --install-allowed
+
+specify extension add tdd
+specify extension update tdd</code></pre>
+              <p class="example-note">
+                Community extensions are author-maintained and not reviewed by Spec Kit. Review the
+                source before approving a catalog.
+              </p>
+            </article>
+          </div>
+
+          <p class="note">
+            More refusal codes and fixes live in
+            <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki/Troubleshooting"
+              >Troubleshooting</a
+            >.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="container">
+          <h2>Frequently asked questions</h2>
+          <div class="faq">
+            <details>
+              <summary>Why does <code>specify extension add tdd</code> fail?</summary>
+              <p>
+                The extension lives in Spec Kit's community catalog, which is discovery only and
+                carries <code>install_allowed: false</code>. The CLI can list it but will not
+                install until you opt in. Either install directly with
+                <code>--from &lt;release-zip-url&gt;</code>, or approve the community catalog once.
+                Full steps are in <a href="#install-help">install help</a>.
+              </p>
+            </details>
+            <details>
+              <summary>Why not just tell the agent to write tests first?</summary>
+              <p>
+                Because that is an instruction, and what you need is evidence. An agent asked to be
+                test-driven will produce a test file and an implementation in one pass and sincerely
+                describe the result as test-driven. Nothing in the output distinguishes that from a
+                real cycle. What makes it checkable is the ordering being recorded as it happens,
+                and a separate pass with no memory of the session cross-checking that record against
+                git history.
+              </p>
+            </details>
+            <details>
+              <summary>Which language does it support?</summary>
+              <p>
+                All of them, because it does not know any of them.
+                <code>/speckit.tdd.setup</code> detects the stack from your manifests, scripts, CI
+                config, and test layout, runs each command to prove it works, and writes them to a
+                profile the other commands read. Starting points are documented for JS and TS,
+                Python, JVM, .NET, Go, Rust, Ruby, PHP, Swift, Elixir, C and C++, and Dart, along
+                with their coverage, mutation, and property-based tooling. Detection always wins
+                over the table.
+              </p>
+            </details>
+            <details>
+              <summary>Will it edit my tests to make them pass?</summary>
+              <p>
+                No. That is the hardest rule in the extension: no loosened assertion, no widened
+                tolerance, no value check turned into a truthiness check, no skip, no narrowed
+                filter, no lowered threshold. When a test and the code disagree,
+                <code>spec.md</code> decides which is wrong. The audit checks the branch diff for
+                exactly these edits, and any of them is a FAIL condition on its own.
+              </p>
+            </details>
+            <details>
+              <summary>Does it work on legacy code with no tests?</summary>
+              <p>
+                That case is planned for explicitly. A component the feature must change but which
+                has no tests gets characterization behaviors first: tests that capture what the code
+                does today, including behavior that looks wrong, as a baseline. They are verified
+                with a deliberate mutant so a vacuous baseline cannot slip through, and they are
+                scheduled before the behaviors that change that component.
+              </p>
+            </details>
+            <details>
+              <summary>Is mutation testing required?</summary>
+              <p>
+                No, and it is scoped when it runs: only the files the feature changed, with the
+                scope reported alongside the score so numbers stay comparable. Where the ecosystem
+                has no mutation tool, the audit uses deliberate mutants on the highest-risk
+                behaviors instead, and states how many were sampled so the report cannot read as
+                exhaustive.
+              </p>
+            </details>
+            <details>
+              <summary>I squash my branches. Does that break it?</summary>
+              <p>
+                It costs you the strongest evidence. The audit's PROVEN class needs git history to
+                corroborate that the test changed with or before the source, and a squashed branch
+                loses that ordering. Those behaviors become LIKELY, which does not block a pass but
+                caps the verdict at PASS_WITH_GAPS. Keep the per-cycle commits until after the audit
+                and squash on merge instead.
+              </p>
+            </details>
+            <details>
+              <summary>How does it relate to the BDD and testing extensions?</summary>
+              <p>
+                It composes with them rather than replacing them. Gherkin scenarios from the
+                <code>bdd</code> extension become outer-loop behaviors, generated scaffolds become
+                list items the loop still has to drive to red, and existing traceability or
+                coverage-drift reports become corroboration in the audit. The gap this fills is the
+                loop discipline and the test-strength check, which nothing else in the catalogue
+                does.
+              </p>
+            </details>
+            <details>
+              <summary>Does the extension run by itself?</summary>
+              <p>
+                No. The commands are Markdown prompts. They need a Spec Kit-aware assistant to
+                resolve and execute them. The release zip is portable and has no runtime of its own.
+              </p>
+            </details>
+            <details>
+              <summary>How do I update the extension?</summary>
+              <p>
+                If you approved the community catalog, run
+                <code>specify extension update tdd</code>. Otherwise rerun the direct install with
+                the newer release URL. Your <code>specs/</code> tree and your stack profile are not
+                touched.
+              </p>
+            </details>
+          </div>
+          <p class="note">
+            More answers in the
+            <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki/FAQ">full FAQ</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-col">
+          <p class="footer-brand">TDD Extension</p>
+          <p class="footer-tag">
+            A Spec Kit extension for a language-agnostic red-green-refactor loop with recorded
+            evidence and mutation-checked test strength. MIT licensed.
+          </p>
+        </div>
+        <nav class="footer-links" aria-label="Footer">
+          <a href="https://github.com/d0whc3r/spec-kit-tdd">Repository</a>
+          <a href="https://github.com/d0whc3r/spec-kit-tdd/wiki">Docs wiki</a>
+          <a href="https://github.com/d0whc3r/spec-kit-tdd/issues">Issues</a>
+          <a href="https://github.com/d0whc3r/spec-kit-tdd/discussions">Discussions</a>
+          <a href="https://github.com/github/spec-kit">Spec Kit core</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
