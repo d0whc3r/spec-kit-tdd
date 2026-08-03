@@ -13,6 +13,7 @@ little, and a green suite reads as done. This extension closes that gap with
 evidence rather than trust.
 
 ```
+once      ->  /speckit.tdd.setup                       (the stack, proved by running it)
 spec-kit  ->  /speckit.specify ... /speckit.tasks       (the specification)
 you       ->  /speckit.tdd.plan                          (criteria become a test list)
 loop      ->  /speckit.tdd.run                           (red, green, refactor, logged)

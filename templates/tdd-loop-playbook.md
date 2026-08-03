@@ -66,6 +66,9 @@ Rules for the list:
 - Every line traces to an acceptance criterion, a functional requirement, or an
   explicitly recorded invariant. A line that traces to nothing is either a
   missing requirement (raise it) or scope creep (drop it).
+- Listing behaviors is not designing the implementation. Deciding classes,
+  layers, or algorithms while listing produces a list shaped like the design
+  instead of like the requirement. The design belongs in `plan.md` and in step 5.
 - When the loop discovers a new case, it is appended to the list, not
   implemented on the spot. The current cycle finishes first.
 
