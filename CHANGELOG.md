@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.1.0...v1.1.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* reviewed ([48a041d](https://github.com/d0whc3r/spec-kit-tdd/commit/48a041d54e30f0a01d90e94fac6821659cee0e96))
+
 # [1.1.0](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.0.0...v1.1.0) (2026-08-03)
 
 
