@@ -20,7 +20,7 @@ you opt in. Two ways forward.
 pin a version:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v0.1.0/tdd-0.1.0.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.0.0/tdd-1.0.0.zip
 ```
 
 **Approve the community catalog once**, if you want to install and update by name:
