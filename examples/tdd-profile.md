@@ -17,7 +17,13 @@ stacks:
     approval: vitest snapshots
     contract: null
     test_glob: "src/**/*.test.ts"
-    exemplar: src/orders/total.test.ts
+    exemplar:
+      unit: src/orders/total.test.ts
+      property: src/orders/total.prop.ts
+      acceptance: tests/acceptance/orders.spec.ts
+    helpers:
+      - src/testing/factories.ts
+      - tests/acceptance/fixtures.ts
 verified: [single, file, suite, coverage, mutation, acceptance]
 suite_baseline: green
 suite_seconds: 34
@@ -37,9 +43,14 @@ was executed in this repository before it was recorded here.
   mocking library, and no test in the repository mocks a module it is testing.
 - Fixtures are plain factory functions in `src/testing/factories.ts`. Follow
   `makeOrder()` and `makeClaims()` rather than building objects inline.
+- Acceptance tests take their signed-in page and seeded account from the Playwright
+  fixtures in `tests/acceptance/fixtures.ts`. They never sign in through the UI by
+  hand.
 - The clock is injected as a `Clock` port (`src/lib/clock.ts`). Production code never
   calls `Date.now()` directly, and neither does a test.
-- Exemplar to imitate: `src/orders/total.test.ts`.
+- Exemplars to imitate: `src/orders/total.test.ts` for a unit test,
+  `src/orders/total.prop.ts` for a property test, and
+  `tests/acceptance/orders.spec.ts` for an acceptance test.
 
 ## Notes and constraints
 

@@ -91,9 +91,17 @@ subject, over-mocked collaborators, vacuous assertion, self-approving snapshot,
 conditional logic in the test, empty or always-skipped test.
 
 `MED`: implementation coupled, assertion roulette, eager test, magic values, mystery
-guest, non-deterministic, sleepy test.
+guest, non-deterministic, sleepy test, redundant test, foreign style, bypassed test
+utility, framework under test.
 
 `LOW`: duplicated setup, unclear name.
+
+The last four `MED` items are graded against your repository rather than against an
+absolute rule, so the audit opens the profile's conventions, the exemplar for each
+test kind, and every recorded helper before the pass: a redundant test is one another
+test at the same level already pins, and foreign style or a bypassed utility means the
+test works but does not look like the suite it joined. An acceptance test and a unit
+test covering the same criterion is double-loop TDD, not redundancy.
 
 The full definitions are in the shipped rubric. Every `HIGH` is reported with what the
 test asserts today and what it should assert instead, and the audit does not rewrite

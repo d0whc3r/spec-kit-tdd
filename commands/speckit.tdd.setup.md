@@ -97,7 +97,11 @@ Record as you go:
 - The command CI runs to gate merges. That is the authoritative suite command,
   including the environment variables it sets.
 - Where tests live, how they are named, which assertion style and double library
-  they use, and one **exemplar test file** the loop should imitate.
+  they use, one **exemplar test file per test kind** the loop should imitate (a
+  unit exemplar does not tell it how an acceptance test is written), and the
+  **shared test utilities** it must reuse: factories, builders, custom matchers,
+  fixture setup files, base test classes, container helpers. The runner's own
+  configuration is where these are registered, so read it.
 - Which of the six capabilities appear available: single test, full suite, useful
   failure output, coverage, mutation, property based. Also note the acceptance or
   end-to-end runner, the contract tool, the approval or snapshot tool, and watch
@@ -148,8 +152,12 @@ Rules for the file:
 - Absent capabilities are present as explicit `null` with a note in the body.
   Silence reads as "not looked at".
 - `detected_at` is `git rev-parse --short HEAD`. Record it before writing.
-- The conventions section names the exemplar test file. The loop imitates it, so a
-  vague convention here becomes a wrong test later.
+- The conventions section names the exemplar for each test kind and every shared
+  test utility, and says what each one is for. The loop imitates and reuses them,
+  so a vague convention here becomes a wrong test later, and a utility left
+  unnamed gets hand-rolled a second time.
+- Every path recorded under `exemplar` and `helpers` was opened and is what the
+  profile says it is. A stale path is copied into every test the loop writes.
 - On `refresh`, diff against the previous content and report every changed line.
   Do not silently overwrite a working command with a new guess.
 

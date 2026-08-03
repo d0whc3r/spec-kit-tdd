@@ -31,9 +31,12 @@ home), the contract tool, the approval or snapshot tool, and watch mode.
    project actually runs, with the flags it needs.
 3. **The CI config.** Whatever gates merges is the authoritative suite command,
    including the environment variables it sets.
-4. **The test layout.** Where tests live, how they are named, which assertion style
-   and double library they use. One exemplar test file is recorded, because the loop
-   imitates it.
+4. **The test layout and its utilities.** Where tests live, how they are named, which
+   assertion style and double library they use, plus the runner's configuration and
+   fixture entry points, because that is where the shared helpers live: `conftest.py`,
+   vitest `setupFiles`, a base test class, custom matchers, factory modules. One
+   exemplar test file is recorded **per test kind**, because the loop imitates it and
+   a unit exemplar says nothing about how an acceptance test is written.
 5. **The lock file.** A mutation or property library in the lock file is available; one
    mentioned in a README is not.
 6. **Actually running each candidate.** Nothing is recorded until it has been executed
@@ -189,7 +192,7 @@ The test name inside the file is the one place where the behavior sentence gets
 reshaped, and it follows whatever the ecosystem already does: an `it("accepts a token
 expiring now")` in JS, `test_accepts_token_expiring_now` in pytest,
 `TestAcceptsTokenExpiringNow` in Go, `acceptsTokenExpiringNow` in JUnit. The loop
-copies the convention out of the exemplar test file recorded in the profile instead of
+copies the convention out of the exemplar recorded for that test kind instead of
 imposing one, which is also why no example test source is shipped with this extension:
 the naming that matters is yours, not ours.
 
@@ -216,7 +219,12 @@ stacks:
     property: fast-check
     contract: null
     test_glob: "src/**/*.test.ts"
-    exemplar: src/orders/total.test.ts
+    exemplar:
+      unit: src/orders/total.test.ts
+      acceptance: tests/acceptance/orders.spec.ts
+    helpers:
+      - src/testing/factories.ts
+      - tests/acceptance/fixtures.ts
 verified: [single, file, suite, coverage, mutation]
 suite_baseline: green
 suite_seconds: 34
@@ -228,8 +236,14 @@ Absent capabilities are explicit `null` with a note, never omitted: silence read
 
 The body carries what the frontmatter cannot: where test files sit, which assertion
 and double style to use, how fixtures are built, what is injected rather than reached
-for, the exemplar to imitate, and the constraints worth knowing (suite wall time,
-environment variables the suite sets, packages with no runner).
+for, the exemplar to imitate for each test kind, what each recorded helper is for, and
+the constraints worth knowing (suite wall time, environment variables the suite sets,
+packages with no runner).
+
+`exemplar` and `helpers` are what keep generated tests consistent with the ones you
+already have. `/speckit.tdd.run` imitates the exemplar for the kind of test it is
+writing and reuses the recorded helpers instead of hand-rolling a second factory or
+matcher, and `/speckit.tdd.verify` reports a test that ignores either as a smell.
 
 For a polyglot repository there is one entry per stack and one conventions section per
 stack. Two ecosystems are never averaged into one command.

@@ -24,8 +24,9 @@ ones less meaningful, so the report says which stage failed.
    and by deliberate mutants where it does not.
 4. **Is every requirement covered?** Does each acceptance criterion in `spec.md`
    reach at least one test that exercises the real entry point?
-5. **Are the tests worth keeping?** Deterministic, fast, readable, and insensitive
-   to refactoring, or a maintenance burden that will be deleted in three months.
+5. **Are the tests worth keeping?** Deterministic, fast, readable, consistent with
+   the suite they join, and insensitive to refactoring, or a maintenance burden
+   that will be deleted in three months.
 
 ## Evidence sources
 
@@ -82,6 +83,16 @@ For each new or changed test file, check every item. Severity is fixed: `HIGH`
 means the test proves nothing or actively misleads, `MED` means it will decay,
 `LOW` means readability.
 
+Four of the items are relative to the repository rather than absolute, so read
+the stack profile's `## Conventions to match` section, the exemplar for each test
+kind, and every path under `helpers` before starting the pass. A test cannot be
+graded against a standard the auditor has not opened. A test in a foreign style,
+or one that hand-rolls what a recorded helper already provides, may prove its
+behavior perfectly and still be a finding: it is the next author's licence to
+invent a third way. On `Redundant test`, note that an acceptance test and a unit
+test covering one criterion is double-loop TDD working as intended, not a
+duplicate. Two tests at the same level that one bug would fail together are.
+
 | Smell                         | What it looks like                                                                             | Severity |
 | ----------------------------- | ---------------------------------------------------------------------------------------------- | -------- |
 | Assertion free                | Calls the code, asserts nothing. Or asserts only "did not throw" where the behavior is a value | HIGH     |
@@ -100,6 +111,10 @@ means the test proves nothing or actively misleads, `MED` means it will decay,
 | Mystery guest                 | Depends on an external file, fixture database, or shared state not visible in the test         | MED      |
 | Non-deterministic             | Real clock, real random, real network, real sleep, or dependence on test execution order       | MED      |
 | Sleepy test                   | A fixed sleep instead of waiting on a condition                                                | MED      |
+| Redundant test                | A second test pinning what another test at the same level already pins                         | MED      |
+| Foreign style                 | Naming, assertions, or fixtures that do not match the exemplar for that test kind              | MED      |
+| Bypassed test utility         | A hand-rolled fixture, double, or matcher the profile's `helpers` already provides             | MED      |
+| Framework under test          | Asserts behavior owned by the framework or a library rather than by the feature                | MED      |
 | Duplicated setup              | The same fixture construction copied across tests instead of one factory                       | LOW      |
 | Unclear name                  | A name that does not state the behavior, so failure output says nothing                        | LOW      |
 

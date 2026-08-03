@@ -26,6 +26,10 @@ Also record, when they exist: the acceptance or end-to-end runner (the outer
 loop's home), the contract-test tool, the approval or snapshot tool, and how to
 run the suite in watch mode for a human following along.
 
+Record the repository's test utilities too. They are not a capability, but a test
+that hand-rolls a fixture the project already ships reads as an import from
+another codebase, and the loop cannot reuse what the profile never named.
+
 ## Detection order
 
 Detect, do not ask first. Ask only what the repository cannot answer.
@@ -41,9 +45,17 @@ Detect, do not ask first. Ask only what the repository cannot answer.
 3. **Read the CI config.** `.github/workflows/*`, `.gitlab-ci.yml`, `Jenkinsfile`.
    Whatever gates merges is the authoritative suite command, including the
    environment variables it sets.
-4. **Read the test layout.** Where existing tests live, how they are named, which
-   assertion style and which double library they use. The loop must write tests
-   that look like the ones already there. Record one exemplar test file path.
+4. **Read the test layout and the utilities it already has.** Where existing
+   tests live, how they are named, which assertion style and which double library
+   they use. Then open the runner's own configuration and the shared fixture
+   entry points, because that is where a project keeps the helpers a new test is
+   expected to reuse: `conftest.py`, vitest `setupFiles`, jest
+   `setupFilesAfterEnv`, a `TestBase` or `*TestCase` class, custom matchers,
+   factory or object-mother modules, testcontainers and fixture-server helpers.
+   Record their paths, and record one exemplar test file **per test kind** the
+   stack can run. A unit exemplar says nothing about how an acceptance test is
+   written when the two use different runners, and the outer loop is exactly the
+   layer that must integrate correctly.
 5. **Check the lock file for the tools.** A mutation or property library present in
    the lock file is available; one merely mentioned in a README is not.
 6. **Run each candidate command.** A profile entry is a command that has been
@@ -106,12 +118,21 @@ stacks:
     approval: vitest snapshots
     contract: null # absent capabilities are explicit, never omitted
     test_glob: "src/**/*.test.ts"
-    exemplar: src/orders/total.test.ts
+    exemplar: # one per test kind the stack can run, never one file for all of them
+      unit: src/orders/total.test.ts
+      acceptance: tests/acceptance/orders.spec.ts
+    helpers: # test utilities a new test reuses instead of hand-rolling
+      - src/testing/factories.ts
+      - vitest.setup.ts
 verified: [single, file, suite, coverage, mutation] # each was run successfully
 suite_baseline: green # green | red, at detection time
 suite_seconds: 34 # observed wall time of the full suite
 ---
 ```
+
+A profile written before `exemplar` became a map records it as a single path. Read
+it as the unit exemplar, say in the report that the acceptance layer has none, and
+suggest `/speckit.tdd.setup refresh` rather than guessing one.
 
 The body records what the frontmatter cannot:
 
@@ -126,9 +147,12 @@ The body records what the frontmatter cannot:
   mocking library.
 - Fixtures are plain factory functions in `src/testing/factories.ts`. Follow
   `makeOrder()` rather than building objects inline.
+- `vitest.setup.ts` registers the custom `toBeMoney` matcher. Use it rather than
+  comparing cents by hand.
 - The clock is injected as a `Clock` port (`src/lib/clock.ts`). Never call
   `Date.now()` in production code or in a test.
-- Exemplar to imitate: `src/orders/total.test.ts`.
+- Exemplars to imitate: `src/orders/total.test.ts` for a unit test,
+  `tests/acceptance/orders.spec.ts` for an acceptance test.
 
 ## Notes and constraints
 
@@ -193,7 +217,10 @@ A command is not recorded until it has been run in this repository:
 3. Run the coverage command and confirm a report is produced.
 4. Run the mutation command scoped to one small file and confirm it completes.
    Record how long it took, because that determines whether the audit can use it.
-5. Record only the commands that passed, in `verified:`. Anything unverified is
+5. Open every path recorded under `exemplar` and `helpers` and confirm it exists
+   and is what the profile claims it is. A helper path that moved, or an exemplar
+   that is itself a poor test, is copied into every test the loop writes.
+6. Record only the commands that passed, in `verified:`. Anything unverified is
    recorded as `null` with a note, never as a plausible guess.
 
 Re-verify when the profile's `detected_at` is far behind `HEAD` and the manifests

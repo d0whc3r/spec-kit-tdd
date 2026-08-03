@@ -94,7 +94,10 @@ compared to the standard that produced it.
 ### Phase 0: Preflight
 
 - Read `.specify/memory/tdd-profile.md` for the suite, coverage, and mutation
-  commands and the test layout. If absent, the audit is `BLOCKED`: say what is
+  commands and the test layout. Read its conventions section, the exemplar
+  recorded for each test kind, and the paths under `helpers` as well: four items
+  in the smell catalogue grade the tests against those and cannot be judged
+  without them. If the profile is absent, the audit is `BLOCKED`: say what is
   needed and stop.
 - Resolve the feature directory with spec-kit's own resolver, not a guess: run
   `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
@@ -160,6 +163,13 @@ by item. Do not skim for the obvious ones: the `HIGH` smells that matter most
 (tautological assertions, doubled subject, re-implemented expectations, vacuous
 assertions) all read as perfectly reasonable tests at a glance.
 
+Four of the catalogue's items grade the test against this repository rather than
+against an absolute rule: `Redundant test`, `Foreign style`, `Bypassed test
+utility`, and `Framework under test`. Judge them with the profile's conventions,
+the exemplar for that test kind, and the `helpers` paths open. A test that passes
+and proves its behavior but is written in a style the repository does not use is a
+real finding, because it is the next author's licence to invent a third style.
+
 For each finding record the `file:line`, what the test asserts today, and what it
 should assert instead. Where several tests share one smell, report it once with all
 locations.
@@ -170,7 +180,8 @@ A suite that is smell free but takes 20 minutes or fails intermittently is still
 poor safety net, and the report should say so.
 
 Where a fresh-context subagent is available, delegate this pass with the absolute
-path to the rubric, the list of files to read, and an instruction to return findings
+path to the rubric, the profile's conventions section and its exemplar and
+`helpers` paths, the list of files to read, and an instruction to return findings
 only, with no fixes and no file dumps. Include Hard Rules 6 and 7 verbatim, since a
 subagent does not inherit them. Vet what it returns by opening every cited line
 yourself before it reaches the report: a mis-attributed smell in a report is worse

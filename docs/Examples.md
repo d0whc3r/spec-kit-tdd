@@ -42,7 +42,8 @@ suite_seconds: 34
 
 The body records the conventions the loop has to match (test file naming, the
 `vi.fn()` double style, factories in `src/testing/factories.ts`, the injected `Clock`
-port) and one exemplar test file to imitate. It also records what is missing:
+port) plus one exemplar test file to imitate per test kind and the helper files a new
+test reuses instead of hand-rolling. It also records what is missing:
 `packages/legacy` has no runner, so work there needs characterization tests and has no
 single-test command.
 

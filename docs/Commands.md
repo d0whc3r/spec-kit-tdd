@@ -50,8 +50,9 @@ red in the project into a false green.
 **What it records.** Six capabilities: run one test, run the suite, useful failure
 output, coverage, mutation, property-based testing. Plus the acceptance runner, the
 contract tool, the approval or snapshot tool, watch mode, the test conventions to
-match, and one exemplar test file the loop imitates. Anything unverified is
-recorded as `null` with a note, never as a plausible guess.
+match, one exemplar test file per test kind the loop imitates, and the shared test
+utilities it reuses rather than reinventing. Anything unverified is recorded as
+`null` with a note, never as a plausible guess.
 
 **The constitution principle.** TDD holds only where the project's own rules say
 so, because `/speckit.plan`, `/speckit.tasks`, and `/speckit.implement` all read

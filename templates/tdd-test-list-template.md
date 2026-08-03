@@ -231,6 +231,11 @@ Anything the audit must know that does not fit a cycle:
   invariant id in `spec.md`? Trace values are checked mechanically by the audit.
 - Is every behavior line one behavior, phrased as an observable result rather than
   a call to make?
+- Does any pair of lines describe the same observable result in different words?
+  Two lines a single bug would fail together are one behavior: merge them, keep
+  the clearer wording, and drop the other id with a reason. An `A` behavior and
+  the `U` behaviors beneath it are not a duplicate, because the outer loop is what
+  fails when the units are individually right and collectively wrong.
 - Are the boundaries listed, not just the happy path? For every rule with a
   threshold there should be a line on each side of it.
 - Are the error paths listed, with the specific expected failure, not "handles
