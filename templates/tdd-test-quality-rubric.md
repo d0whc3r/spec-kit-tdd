@@ -188,13 +188,16 @@ that requires reading three sections to understand will be ignored.
 
 ## Report format
 
-`specs/<feature>/tdd/verification.md`, overwritten on each run. Previous runs are
-kept in git history, so the file always shows current state.
+`FEATURE_DIR/tdd/verification.md`, overwritten on each run. Previous runs are kept
+in git history, so the file always shows current state. `standard:` names the rubric
+file the audit actually resolved and graded against, so a verdict can be read
+against the standard that produced it.
 
 ```markdown
 ---
 feature: 003-user-auth
 verdict: PASS_WITH_GAPS
+standard: .specify/extensions/tdd/templates/tdd-test-quality-rubric.md # rubric graded against
 verified_at: 9f3a1c2 # short SHA audited
 behaviors: 18
 proven: 15

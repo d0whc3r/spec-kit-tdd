@@ -19,9 +19,9 @@ Where the loop sits in the spec-kit lifecycle, and what it leaves behind.
                                                              specs/<feature>/tasks.md (tests mandatory)
 
  /speckit.implement          ->  /speckit.tdd.run        ->  tests + source in the working tree
-   (before it starts)            (before_implement hook)     cycle-log.md (one entry per cycle)
+   (waits for it)                (before_implement hook)     cycle-log.md (one entry per cycle)
                                  red -> green -> refactor    test-list.md (states -> DONE)
-                                 one commit per cycle
+                                 one commit per cycle        tasks.md (behavioral tasks ticked)
 
  /speckit.implement          ->  /speckit.tdd.verify     ->  specs/<feature>/tdd/verification.md
    (after it finishes)           (after_implement hook)      tasks.md (remediation phase)
@@ -32,24 +32,25 @@ and each command's precondition is the previous one's output.
 
 ## Two ways to run the implementation phase
 
-**Drive the loop directly.** `/speckit.tdd.run all` walks the test list, one behavior
+**Drive the loop directly.** `/speckit.tdd.run` walks the whole test list, one behavior
 per cycle, and is the tightest form of the discipline. Use it when the feature is
-mostly behavior: rules, calculations, validation, state transitions.
+mostly behavior: rules, calculations, validation, state transitions. When it finishes,
+every behavioral task is ticked and the remaining tasks are the ones that never
+belonged in a red-green cycle.
 
-**Run `/speckit.implement` against the reordered task list.** `/speckit.tdd.plan`
-already made the test tasks mandatory and put each one before the implementation it
-covers, so the core command follows the same ordering. Use it when the feature has
-a lot of non-behavioral work (scaffolding, configuration, wiring) that does not
-belong in a red-green cycle, and reach for `/speckit.tdd.run` on the behavioral
-tasks.
+**Run `/speckit.implement`.** The `before_implement` hook runs the loop first, waits for
+it, and only then lets the core command work through what is left. That is not a
+suggestion the hook prints: spec-kit waits for a hook only when it is not optional, so
+this one is mandatory. Use this path when the feature carries a lot of scaffolding,
+configuration, or wiring alongside the behavior.
 
-The `before_implement` hook is what makes that choice explicit: `/speckit.implement`
-asks once whether to run the loop over the behavioral tasks first. The loop does not
-tick task checkboxes, so it reports the task ids it covered and you pass the rest to
-`/speckit.implement`.
+The two paths meet at the checkboxes. `/speckit.implement` decides what to implement
+from `[X]` in `tasks.md` and nothing else, so the loop ticks each task once every
+behavior its text names (`[U3]`) is `DONE`. Without that, the same behavior would be
+written twice, the second time test-after over freshly test-driven code.
 
-Either way, `/speckit.tdd.verify` grades the result the same way. The difference is
-only how much of the ordering is enforced per cycle rather than per task.
+Either way, `/speckit.tdd.verify` grades the result the same way, and it reports a task
+ticked against a behavior that is not `DONE`.
 
 ## The double loop
 
@@ -110,8 +111,12 @@ the audit checks.
 **The verification report** is overwritten on each run; git history keeps the old
 ones.
 
-There is no index file across features. Commands find state by globbing
-`specs/*/tdd/test-list.md` and reading frontmatter.
+`specs/003-user-auth/` is the usual location, not a requirement. The commands read the
+feature directory from spec-kit (`SPECIFY_FEATURE_DIRECTORY`, then
+`.specify/feature.json`) and build every path from it, so a feature configured outside
+`specs/` still works. There is no index file across features: a cross-feature sweep globs
+`tdd/test-list.md` under whatever tree holds the resolved feature directory and reads the
+frontmatter.
 
 Full field reference in [Test List Format](Test-List-Format.md).
 

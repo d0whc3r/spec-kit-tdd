@@ -4,16 +4,22 @@ Four commands. Each has one job, one moment in the lifecycle, and one set of fil
 it is allowed to write. The boundaries are deliberate: the command that grades the
 work is not the command that does it.
 
-| Command                                    | Runs                     | Reads                                                          | Writes                                                           |
-| ------------------------------------------ | ------------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [`/speckit.tdd.setup`](#speckittddsetup)   | once per repository      | manifests, scripts, CI config, test layout                     | `.specify/memory/tdd-profile.md`, constitution (with approval)   |
-| [`/speckit.tdd.plan`](#speckittddplan)     | after `/speckit.tasks`   | `spec.md`, `plan.md`, `tasks.md`, the profile                  | `specs/<feature>/tdd/test-list.md`, `cycle-log.md`, `tasks.md`   |
-| [`/speckit.tdd.run`](#speckittddrun)       | the implementation phase | the test list, the profile, `spec.md`                          | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
-| [`/speckit.tdd.verify`](#speckittddverify) | after the loop           | the cycle log, git history, the tests and source as they stand | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
+| Command                                    | Runs                     | Reads                                                          | Writes                                                          |
+| ------------------------------------------ | ------------------------ | -------------------------------------------------------------- | --------------------------------------------------------------- |
+| [`/speckit.tdd.setup`](#speckittddsetup)   | once per repository      | manifests, scripts, CI config, test layout                     | `.specify/memory/tdd-profile.md`, constitution (with approval)  |
+| [`/speckit.tdd.plan`](#speckittddplan)     | after `/speckit.tasks`   | `spec.md`, `plan.md`, `tasks.md`, the profile                  | `tdd/test-list.md`, `tdd/cycle-log.md`, `tasks.md`              |
+| [`/speckit.tdd.run`](#speckittddrun)       | the implementation phase | the test list, the profile, `tasks.md`, `spec.md`              | tests, source, `tdd/cycle-log.md`, ticks the tasks it completed |
+| [`/speckit.tdd.verify`](#speckittddverify) | after the loop           | the cycle log, git history, the tests and source as they stand | `tdd/verification.md`, remediation in `tasks.md`                |
 
-Three hooks offer the right command at the right moment if you leave them enabled,
-and each asks first: `after_tasks` offers `plan`, `before_implement` offers `run`,
-`after_implement` offers `verify`.
+Every path is relative to the feature directory spec-kit resolves, which is usually
+`specs/<feature>/` but never assumed to be.
+
+Three hooks put the right command at the right moment if you leave them enabled.
+`after_tasks` offers `plan` and `after_implement` offers `verify`; both prompt, and
+you can decline. `before_implement` runs `run` and `/speckit.implement` waits for it,
+because spec-kit only waits for a hook that is not optional, and a prompt that arrives
+after the code is written would be worthless. Disable any of them in
+`.specify/extensions.yml`.
 
 ---
 
@@ -99,7 +105,9 @@ question at a time, each with a recommendation.
 template treats them as optional by default), each test task is placed before the
 implementation it covers, characterization tasks come before the changes they
 protect, and each acceptance criterion gets a closing task requiring its
-outer-loop test to be green. Existing task ids, checkbox states, and formatting are
+outer-loop test to be green. Every behavioral task also carries its behavior id in
+brackets (`[U3]`), which is what lets `/speckit.tdd.run` tick it and
+`/speckit.implement` skip it. Existing task ids, checkbox states, and formatting are
 preserved, and every edit is reported.
 
 On `refresh`, behavior ids are never reused or renumbered, dropped behaviors stay
@@ -113,9 +121,9 @@ rather than silently re-tested. See [Test List Format](Test-List-Format.md).
 The loop. One behavior per cycle.
 
 ```text
-/speckit.tdd.run              # one cycle on the next PENDING behavior
-/speckit.tdd.run next         # the same thing, spelled out
-/speckit.tdd.run all          # keep cycling until the list is done
+/speckit.tdd.run              # every PENDING behavior, one cycle each
+/speckit.tdd.run all          # the same thing, spelled out
+/speckit.tdd.run next         # stop after one cycle
 /speckit.tdd.run U3 U4        # specific behaviors, in that order
 /speckit.tdd.run outer        # the next acceptance behavior
 /speckit.tdd.run resume       # continue a cycle interrupted mid-flight
@@ -123,13 +131,26 @@ The loop. One behavior per cycle.
 /speckit.tdd.run --no-commit  # leave the changes uncommitted
 ```
 
+`all` is the default because the `before_implement` hook invokes this command with no
+arguments, and one cycle out of twenty would leave the other nineteen to be written
+test-after by `/speckit.implement`. Reach for `next` when you want to inspect a single
+cycle.
+
 **The cycle.** Select one behavior, write one test in the repository's existing
 style, run only that test, confirm it fails for the right reason, record the real
 failure output, make it pass with the smallest sufficient change, run the full
-suite, refactor while green, append the cycle log entry, commit.
+suite, refactor while green, append the cycle log entry, tick the tasks that behavior
+covers, commit.
 
 **It is the only command that writes tests or source.** Everything else reads,
 plans, or grades.
+
+**Why it touches `tasks.md`.** Only the checkboxes, and only for a behavior that is
+`DONE`. `/speckit.implement` decides what to implement from `[X]` alone, so a task the
+loop already drove has to be ticked or the feature gets a second, test-after
+implementation written over the first. The link is the behavior id `/speckit.tdd.plan`
+put in the task text (`[U3]`); a task with no marker is left alone, which is how the
+non-behavioral work stays with `/speckit.implement`.
 
 **What counts as a valid red** and what to do when a test passes on its first run
 (the deliberate-mutant check) is in [The Loop](The-Loop.md), along with step-size
@@ -171,7 +192,9 @@ asserted). Where they disagree, history wins over the log and the report says so
 existing ones. An assertion removed or loosened, a value check turned into a
 truthiness check, a widened tolerance, a test renamed out of a filter's reach, a
 skip added, a threshold lowered. Each is reported with the before and after,
-whatever justification was given.
+whatever justification was given. It also checks the checkboxes against the test
+list: a task ticked against a behavior that is not `DONE` is a completion claim with
+no evidence, and a `HIGH` finding.
 
 **Test strength.** Mutation testing scoped to the changed files where the ecosystem
 has a tool, with every survivor triaged and mapped to the behavior that should have
@@ -195,8 +218,8 @@ ordered so the blocking ones come first. Clearing them is the loop's job or your
 | a path                | `setup`          | Detect one subtree of a monorepo                          |
 | a feature name        | `plan`, `verify` | Target that feature instead of the resolved one           |
 | a behavior id         | `run`            | Run the loop on exactly those behaviors                   |
-| `next`                | `run`            | One cycle on the first `PENDING` behavior. The default    |
-| `all`                 | `run`            | Keep cycling until the list is done                       |
+| `all`                 | `run`            | Keep cycling until the list is done. The default          |
+| `next`                | `run`            | One cycle on the first `PENDING` behavior, then stop      |
 | `outer`               | `run`            | Work the next acceptance behavior                         |
 | `resume`              | `run`            | Continue an interrupted cycle                             |
 | `outer-only`          | `plan`           | Acceptance behaviors only                                 |

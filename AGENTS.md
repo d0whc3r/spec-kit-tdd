@@ -81,8 +81,11 @@ shell commands, and other important information, read the current plan
 This repository ships the TDD Extension for Spec Kit: a language-agnostic
 red-green-refactor loop for the spec-kit lifecycle. It exposes four commands
 (`/speckit.tdd.setup`, `/speckit.tdd.plan`, `/speckit.tdd.run`,
-`/speckit.tdd.verify`) and two lifecycle hooks (`after_tasks` runs `plan`,
-`after_implement` runs `verify`).
+`/speckit.tdd.verify`) and three lifecycle hooks (`after_tasks` runs `plan`,
+`before_implement` runs `run`, `after_implement` runs `verify`). Only
+`before_implement` is mandatory, because spec-kit waits for a hook solely when its
+`optional` flag is false, and an optional pre-hook would let `/speckit.implement`
+write the whole feature test-after in the same run.
 
 | Agent         | Skill Surface                           | Notes                                         |
 | ------------- | --------------------------------------- | --------------------------------------------- |
@@ -97,7 +100,7 @@ Rules:
 5. **The per-command write boundaries are the product and are non-negotiable:**
    - `setup` writes `.specify/memory/tdd-profile.md`, and `.specify/memory/constitution.md` only with explicit user approval.
    - `plan` writes `specs/<feature>/tdd/test-list.md`, the baseline entry of `specs/<feature>/tdd/cycle-log.md`, and `specs/<feature>/tasks.md`.
-   - `run` is the only command that writes tests or source code, and only under the loop discipline: test first, red observed and recorded, smallest green, refactor on green.
+   - `run` is the only command that writes tests or source code, and only under the loop discipline: test first, red observed and recorded, smallest green, refactor on green. Besides those it writes `<feature>/tdd/test-list.md`, `<feature>/tdd/cycle-log.md`, and the checkboxes of the `tasks.md` tasks whose behavior ids are `DONE`. That last one is load bearing: `/speckit.implement` decides what to implement from the checkboxes alone, so an unticked task the loop drove gets a second, test-after implementation.
    - `verify` writes `specs/<feature>/tdd/verification.md` and a remediation section in `tasks.md`. It never fixes what it finds. An auditor that edits the code it grades is worthless, and any change that blurs this is a breaking change to the extension's contract.
 6. Two invariants hold across every command and must survive every edit: a test is never weakened, skipped, deleted, or filtered out to reach green; and red-phase evidence is only ever recorded for a run that actually happened.
 7. Shipped content (commands, templates) uses plain English and no em dashes; `.github/scripts/lint-content.mjs` enforces this along with the canonical heading order of every template.

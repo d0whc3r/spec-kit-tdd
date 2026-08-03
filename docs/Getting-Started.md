@@ -5,7 +5,9 @@ one cycle, longer if your suite is slow.
 
 ## Prerequisites
 
-- Spec Kit `>=0.2.0` initialized in the project (`specify init`).
+- Spec Kit `>=0.11.9` initialized in the project (`specify init`). That is the first
+  release that both resolves the feature directory from `.specify/feature.json` and
+  actually runs a mandatory hook, which the `before_implement` hook depends on.
 - A git repository.
 - **A working test runner.** The extension detects and uses whatever is there. It
   will not create one for you: standing up a test framework is a feature's worth of
@@ -73,10 +75,11 @@ Nothing changes here. Use the core lifecycle:
 
 If you left hooks enabled, `/speckit.tasks` already offered this and asked first.
 
-It writes `specs/<feature>/tdd/test-list.md`: one acceptance behavior per
-acceptance criterion (the outer loop), the unit behaviors each component owns (the
-inner loop), each traced to what it serves. It also edits `tasks.md` so test tasks
-are no longer optional and each one sits before the implementation it covers.
+It writes `tdd/test-list.md` inside the feature directory: one acceptance behavior
+per acceptance criterion (the outer loop), the unit behaviors each component owns
+(the inner loop), each traced to what it serves. It also edits `tasks.md` so test
+tasks are no longer optional, each one sits before the implementation it covers, and
+each behavioral task carries its behavior id (`[U3]`) so the loop can tick it later.
 
 **Read the list now.** This is the cheapest moment in the whole feature to catch a
 missing boundary case, an error path phrased as "handles errors", or a criterion
@@ -85,27 +88,35 @@ costs a rewrite.
 
 ## 5. Run the loop
 
+Start with a single cycle so you can see one from end to end:
+
 ```text
-/speckit.tdd.run
+/speckit.tdd.run next
 ```
 
-One cycle on the next pending behavior: write one test, run it, confirm it fails
-for the right reason, record the failure, make it pass with the smallest change,
-run the full suite, refactor while green, commit.
+Write one test, run it, confirm it fails for the right reason, record the failure,
+make it pass with the smallest change, run the full suite, refactor while green,
+tick the tasks that behavior covers, commit.
 
-Read the cycle log entry it produced (`specs/<feature>/tdd/cycle-log.md`). That
-entry, with the real failure message in it, is the evidence the audit will check
-later.
+Read the cycle log entry it produced (`tdd/cycle-log.md` in the feature directory).
+That entry, with the real failure message in it, is the evidence the audit will
+check later.
 
-When you are happy with the rhythm, let it continue:
+When you are happy with the rhythm, let it walk the rest of the list, which is what
+it does with no arguments:
 
 ```text
-/speckit.tdd.run all
+/speckit.tdd.run
 ```
 
 It will stop and report rather than improvise if the suite goes red for an
 unrelated reason, a criterion turns out ambiguous, or going green would require
 changing a test it did not write.
+
+If you left hooks enabled, `/speckit.implement` runs this for you and waits for it
+before writing anything itself. The loop ticks the tasks it drove, so
+`/speckit.implement` then covers only the work that is not a behavior change:
+scaffolding, configuration, wiring.
 
 ## 6. Audit it
 
@@ -120,7 +131,7 @@ meant to say.
 It cross-checks three sources (the cycle log, git history, the files as they
 stand), works through the test-smell rubric, runs mutation testing on the changed
 files, and maps every acceptance criterion to a test. Then it writes
-`specs/<feature>/tdd/verification.md` with one verdict: `PASS`,
+`tdd/verification.md` in the feature directory with one verdict: `PASS`,
 `PASS_WITH_GAPS`, `FAIL`, or `BLOCKED`.
 
 On a `FAIL`, it appends remediation tasks to `tasks.md`. Clear them, then re-run
@@ -131,7 +142,8 @@ the audit.
 ```text
 /speckit.tdd.setup          # once per repository
 /speckit.tdd.plan           # after /speckit.tasks
-/speckit.tdd.run all        # the loop
+/speckit.tdd.run            # the loop, every behavior on the list
+/speckit.implement          # whatever was not a behavior change
 /speckit.tdd.verify         # fresh session, cold audit
 ```
 

@@ -131,7 +131,7 @@ specify extension add tdd</code></pre>
 
           <ul class="hero-badges">
             <li>Four commands</li>
-            <li>Requires Spec Kit &gt;= 0.2.0</li>
+            <li>Requires Spec Kit &gt;= 0.11.9</li>
             <li>MIT licensed</li>
             <li>Any language</li>
           </ul>
@@ -217,7 +217,7 @@ specify extension add tdd</code></pre>
                     before the implementation it covers.
                   </td>
                   <td>
-                    <code>specs/&lt;feature&gt;/tdd/test-list.md</code>, <code>cycle-log.md</code>,
+                    <code>tdd/test-list.md</code>, <code>tdd/cycle-log.md</code>,
                     <code>tasks.md</code>
                   </td>
                 </tr>
@@ -225,10 +225,14 @@ specify extension add tdd</code></pre>
                   <td><code>/speckit.tdd.run</code></td>
                   <td>
                     The loop. One failing test, red proven and recorded, smallest green, full suite,
-                    refactor while green, one commit. Stops and reports rather than improvising when
-                    the suite is red at baseline or a criterion turns out ambiguous.
+                    refactor while green, one commit, and the tasks that behavior covers ticked.
+                    Stops and reports rather than improvising when the suite is red at baseline or a
+                    criterion turns out ambiguous.
                   </td>
-                  <td>tests, source, <code>specs/&lt;feature&gt;/tdd/cycle-log.md</code></td>
+                  <td>
+                    tests, source, <code>tdd/cycle-log.md</code>, the <code>tasks.md</code>
+                    checkboxes it earned
+                  </td>
                 </tr>
                 <tr>
                   <td><code>/speckit.tdd.verify</code></td>
@@ -238,7 +242,7 @@ specify extension add tdd</code></pre>
                     PASS_WITH_GAPS, FAIL, or BLOCKED.
                   </td>
                   <td>
-                    <code>specs/&lt;feature&gt;/tdd/verification.md</code>, remediation in
+                    <code>tdd/verification.md</code>, remediation in
                     <code>tasks.md</code>
                   </td>
                 </tr>
@@ -246,15 +250,22 @@ specify extension add tdd</code></pre>
             </table>
           </div>
           <p class="note">
-            Three hooks offer the right command at the right moment if you leave them enabled, and
-            each asks first: <code>after_tasks</code> offers <code>plan</code>,
-            <code>before_implement</code> offers <code>run</code>,
-            <code>after_implement</code> offers <code>verify</code>. Those are the three moments the
-            discipline is most often skipped.
+            Paths are relative to the feature directory Spec Kit resolves, usually
+            <code>specs/&lt;feature&gt;/</code>.
           </p>
           <p class="note">
-            Modifiers: <code>refresh</code> re-detects or re-derives, <code>all</code> keeps the
-            loop cycling, <code>outer</code> works the next acceptance behavior,
+            Three hooks put the right command at the right moment, at the three moments the
+            discipline is most often skipped. <code>after_tasks</code> offers <code>plan</code> and
+            <code>after_implement</code> offers <code>verify</code>; both prompt, and you can
+            decline. <code>before_implement</code> runs <code>run</code> and
+            <code>/speckit.implement</code> waits for it, because Spec Kit only waits for a hook
+            that is not optional, and a prompt arriving after the code was written would be
+            worthless. The loop ticks the tasks it drove, so <code>/speckit.implement</code> covers
+            only what is left. Disable any hook in <code>.specify/extensions.yml</code>.
+          </p>
+          <p class="note">
+            Modifiers: <code>refresh</code> re-detects or re-derives, <code>next</code> stops the
+            loop after one cycle, <code>outer</code> works the next acceptance behavior,
             <code>tcr</code> switches to <code>test &amp;&amp; commit || revert</code>,
             <code>quick</code> and <code>deep</code> set the audit's depth, and
             <code>branch</code> audits everything the current branch changed.
@@ -446,7 +457,7 @@ mutants_survived: 3
             <li>
               <h3>Install the extension</h3>
               <p>
-                You need Spec Kit &gt;= 0.2.0 initialized (<code>specify init</code>), a git
+                You need Spec Kit &gt;= 0.11.9 initialized (<code>specify init</code>), a git
                 repository, and a working test runner. Install directly from the latest release;
                 this needs no catalog setup and is the recommended path:
               </p>
@@ -474,20 +485,24 @@ ls .specify/extensions/tdd          # extension files present</code></pre>
               <h3>Derive the test list</h3>
               <p>
                 After the usual <code>/speckit.specify</code>, <code>/speckit.plan</code>, and
-                <code>/speckit.tasks</code>. Then read
-                <code>specs/&lt;feature&gt;/tdd/test-list.md</code>. This is the cheapest moment in
-                the whole feature to catch a missing boundary case or a criterion nobody can test.
+                <code>/speckit.tasks</code>. Then read <code>tdd/test-list.md</code> in the feature
+                directory. This is the cheapest moment in the whole feature to catch a missing
+                boundary case or a criterion nobody can test.
               </p>
               <pre data-copy><code>/speckit.tdd.plan</code></pre>
             </li>
             <li>
               <h3>Run the loop, then audit it cold</h3>
               <p>
-                One cycle at a time, or <code>all</code> to keep going. Then run the audit in a
+                With no arguments the loop walks the whole list; <code>next</code> stops it after
+                one cycle. It ticks the behavioral tasks as it goes, so
+                <code>/speckit.implement</code> then covers only the scaffolding, configuration, and
+                wiring that never belonged in a red-green cycle. Run the audit in a
                 <strong>fresh session</strong>: its whole value is having no memory of the loop, so
                 it reads what the tests actually say.
               </p>
-              <pre data-copy><code>/speckit.tdd.run all
+              <pre data-copy><code>/speckit.tdd.run
+/speckit.implement
 /speckit.tdd.verify</code></pre>
             </li>
           </ol>
@@ -517,9 +532,9 @@ ls .specify/extensions/tdd          # extension files present</code></pre>
       |                                                     tasks.md (tests mandatory, ordered)
       v
 /speckit.implement          --&gt;  /speckit.tdd.run      --&gt;  tests + source
-  (before it starts)             (before_implement hook)    tdd/cycle-log.md (one entry per cycle)
+  (waits for it)                 (before_implement hook)    tdd/cycle-log.md (one entry per cycle)
                                  red -&gt; green               tdd/test-list.md (states -&gt; DONE)
-                                 -&gt; refactor -&gt; commit
+                                 -&gt; refactor -&gt; commit      tasks.md (behavioral tasks ticked)
 
 /speckit.implement          --&gt;  /speckit.tdd.verify   --&gt;  tdd/verification.md (verdict)
   (after it finishes)            (after_implement hook)     tasks.md (remediation phase)</code></pre>

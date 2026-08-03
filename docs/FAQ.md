@@ -113,6 +113,38 @@ was run by the authoring session.
 The same reasoning is why it never fixes what it finds. An auditor that edits the code it
 grades has no standing to grade it.
 
+## Why does `/speckit.implement` wait for the loop instead of asking?
+
+Because asking does not work at that point in the lifecycle. Spec Kit waits for a hook
+only when its `optional` flag is false. An optional pre-hook prints its offer and the
+same run carries straight on to implement every unchecked task, so by the time you read
+the question the code is already written test-after. That is the exact failure the hook
+exists to prevent, so `before_implement` is mandatory.
+
+It stays your decision at a level that actually holds: set `enabled: false` on the hook
+in `.specify/extensions.yml` and Spec Kit filters it out before it ever looks at the
+flag. Then run `/speckit.tdd.run` when you want it.
+
+## Will the loop and `/speckit.implement` implement the same thing twice?
+
+No, and the mechanism is worth knowing because it is the only one Spec Kit honors.
+`/speckit.implement` decides what to implement from the `[X]` checkboxes in `tasks.md`
+and nothing else. So `/speckit.tdd.plan` writes each behavior id into the task text
+(`[U3]`), and `/speckit.tdd.run` ticks a task once every behavior it names is `DONE`.
+What is left unticked is the work that never belonged in a red-green cycle: scaffolding,
+configuration, wiring. `/speckit.tdd.verify` checks the coupling from the other side and
+reports a task ticked against a behavior that is not `DONE`.
+
+## Can I change the discipline without forking the extension?
+
+Yes. All four commands resolve their reference documents through Spec Kit's template
+stack: `.specify/templates/overrides/<name>.md` first, then
+`.specify/presets/<preset-id>/templates/<name>.md`, then the extension's own copy under
+`.specify/extensions/tdd/templates/`. Drop a modified `tdd-loop-playbook.md` or
+`tdd-test-quality-rubric.md` into either higher layer and every command reads yours
+instead. The audit records which rubric it graded against in the report's `standard:`
+field, so a verdict stays readable next to the standard that produced it.
+
 ## I squash my branches. Does that break it?
 
 It costs you the strongest evidence. The audit's `PROVEN` class needs git history to
@@ -185,7 +217,9 @@ condition on its own.
 ## Does the extension run by itself?
 
 No. The commands are Markdown prompts. They need a Spec Kit-aware assistant to resolve
-and execute them, and the release zip has no runtime of its own.
+and execute them, and the release zip has no runtime of its own. The one place a command
+starts without you typing it is the `before_implement` hook, and that is Spec Kit
+invoking `/speckit.tdd.run` inside your own session, not a background process.
 
 ## How do I update it?
 

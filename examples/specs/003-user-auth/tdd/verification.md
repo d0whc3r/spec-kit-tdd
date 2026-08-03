@@ -1,6 +1,7 @@
 ---
 feature: 003-user-auth
 verdict: PASS_WITH_GAPS
+standard: .specify/extensions/tdd/templates/tdd-test-quality-rubric.md
 verified_at: 9f3a1c2
 behaviors: 12
 proven: 9

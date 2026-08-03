@@ -24,18 +24,20 @@ specs/<feature>/
     └── verification.md     the audit report, written by /speckit.tdd.verify
 ```
 
-`<feature>` is spec-kit's own feature directory name (for example
-`003-user-auth`), never a name this extension invents. Resolve it with spec-kit's
-own resolver rather than a heuristic: run
+`specs/<feature>/` above is the usual layout, not a rule. Resolve the real
+directory with spec-kit's own resolver rather than a heuristic: run
 `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
 `powershell` or `python` variant the project installed) and take `FEATURE_DIR`
 from its JSON. spec-kit reads the feature from `SPECIFY_FEATURE_DIRECTORY`, then
-`.specify/feature.json`, and errors when neither is set. If the script is absent
-or errors, ask rather than guess, and never infer the feature from the branch name
-or from file timestamps.
+`.specify/feature.json`, and errors when neither is set. Either can point outside
+`specs/`, so every path in this document is relative to `FEATURE_DIR`. If the
+script is absent or errors, ask rather than guess, and never infer the feature from
+the branch name or from file timestamps.
 
-There is no index file across features. Commands discover state by globbing
-`specs/*/tdd/test-list.md` and reading frontmatter.
+There is no index file across features. To find the other features' state, glob
+`tdd/test-list.md` under the directory that holds `FEATURE_DIR` (usually `specs/`)
+and read the frontmatter. A feature configured outside that tree is only reachable
+through its own `FEATURE_DIR`, so a cross-feature sweep says which tree it covered.
 
 ## Frontmatter
 

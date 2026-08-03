@@ -53,7 +53,8 @@ one line: the input or precondition, the expected observable result, and the
 acceptance criterion or requirement it serves. Cover the happy path, the
 boundaries, the error paths, and the invariants that must hold across inputs.
 
-The list lives in `specs/<feature>/tdd/test-list.md` and follows
+The list lives at `tdd/test-list.md` inside the feature directory spec-kit resolves
+(`FEATURE_DIR`, usually `specs/<feature>/`) and follows
 `tdd-test-list-template.md`. `/speckit.tdd.plan` writes it; the loop consumes it
 top to bottom and appends to it.
 

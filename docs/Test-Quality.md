@@ -40,7 +40,7 @@ The audit works through them in order, and says which stage failed:
 
 | Source                             | Answers                                     | Can be wrong because                       |
 | ---------------------------------- | ------------------------------------------- | ------------------------------------------ |
-| `specs/<feature>/tdd/cycle-log.md` | What the loop claims, with the red output   | It is self-reported                        |
+| `tdd/cycle-log.md` in the feature  | What the loop claims, with the red output   | It is self-reported                        |
 | Git history for the feature        | What order test and source actually changed | Squashed or amended commits lose the order |
 | The tests and source as they stand | What the tests actually assert today        | It cannot show what came first             |
 
@@ -74,6 +74,12 @@ highest-signal check in the whole audit:
 
 Each is reported with the `file:line` and the before and after, whatever
 justification was given. Any of them is a `FAIL` condition on its own.
+
+The audit also reads `tasks.md` against the test list, because the checkboxes are what
+the rest of the lifecycle trusts. A task ticked against a behavior that is not `DONE` is
+a completion claim with no evidence behind it, and a `HIGH` finding. A behavioral task
+still unticked with its behavior `DONE` is the milder inverse, and is reported too:
+`/speckit.implement` would write that behavior a second time.
 
 ## The smell catalogue
 
@@ -139,6 +145,10 @@ construction.
 Every report ends with **What was not audited**: the packages skipped, the mutation
 scope, the concerns with no criterion and therefore no test. A report that reads as
 exhaustive when it was not is worse than no report.
+
+The report's frontmatter also names the rubric file the audit resolved (`standard:`).
+Because a project or a preset can override the rubric, a verdict only means something
+next to the standard that produced it.
 
 ## Remediation
 

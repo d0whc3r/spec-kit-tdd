@@ -67,8 +67,10 @@ Asserts:
   per-command write boundaries in `AGENTS.md`.
 - Every modifier each command file recognizes, with no invented ones. The
   modifier summary table must list exactly the union of them.
-- The two hooks and which command each runs, matching
-  `extension.yml.hooks`.
+- All three hooks, which command each runs, and each one's `optional` flag,
+  matching `extension.yml.hooks`. `before_implement` is not optional on
+  purpose: spec-kit only waits for a hook whose flag is false, so a page that
+  describes it as a prompt is wrong.
 
 Re-check whenever: any file under `commands/` or `templates/` changes.
 
@@ -325,7 +327,8 @@ Asserts:
 
 - The hero paragraph (matches `extension.yml.extension.description` and
   the `README.md` lead).
-- The hero badges: command count, `Requires Spec Kit >= 0.2.0`, license.
+- The hero badges: command count, the `Requires Spec Kit >= <floor>` value from
+  `extension.yml.requires.speckit_version`, license.
 - The four commands, with the same names and write paths as
   `docs/Home.md` (HTML form, not byte-equivalent).
 - The hook names and the modifier list.
