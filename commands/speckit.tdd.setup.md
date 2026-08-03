@@ -63,17 +63,16 @@ With no input, run the full workflow below.
 
 ## Templates
 
-This command reads one reference file from the installed extension. Relative to
-this command's extension root:
+This command reads one reference file from the installed extension:
 
-- Stack profile reference: `templates/tdd-stack-profile.md` (what the loop needs,
+- Stack profile reference:
+  `.specify/extensions/tdd/templates/tdd-stack-profile.md` (what the loop needs,
   the detection order, the ecosystem reference table, the profile format, the
   verification steps, and the constitution principle text).
 
-When this extension is installed under `.specify/extensions/tdd/`, the absolute
-path is:
-
-- `.specify/extensions/tdd/templates/tdd-stack-profile.md`
+Where `.specify/templates/overrides/tdd-stack-profile.md` exists, read that
+instead. That path is spec-kit's own override layer, and it is how a project tunes
+an extension's reference without forking it.
 
 Read it now, in full, before Phase 1. The ecosystem table there is a starting
 point for detection, and the "Profile format" and "Constitution principle"

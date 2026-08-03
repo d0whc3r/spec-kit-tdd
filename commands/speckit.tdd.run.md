@@ -78,25 +78,23 @@ With no input, run one cycle on the next pending behavior.
 
 ## Templates
 
-This command reads three reference files from the installed extension. Relative to
-this command's extension root:
+This command reads three reference files from the installed extension:
 
-- Loop discipline: `templates/tdd-loop-playbook.md`. **This is the governing
-  document for every phase below.** Read it in full before the first cycle: the
-  five steps, what counts as a valid red, the deliberate-mutant check, step
-  granularity, test-double guidance, the brownfield path, the forbidden shortcuts,
-  the commit cadence, and the escape hatches.
-- Test list format: `templates/tdd-test-list-template.md` (the behavior states you
-  transition, and the cycle-log entry shape you append).
-- Stack profile reference: `templates/tdd-stack-profile.md` (what each profile
+- Loop discipline: `.specify/extensions/tdd/templates/tdd-loop-playbook.md`.
+  **This is the governing document for every phase below.** Read it in full before
+  the first cycle: the five steps, what counts as a valid red, the
+  deliberate-mutant check, step granularity, test-double guidance, the brownfield
+  path, the forbidden shortcuts, the commit cadence, and the escape hatches.
+- Test list format:
+  `.specify/extensions/tdd/templates/tdd-test-list-template.md` (the behavior
+  states you transition, and the cycle-log entry shape you append).
+- Stack profile reference:
+  `.specify/extensions/tdd/templates/tdd-stack-profile.md` (what each profile
   command means, and how the loop degrades when a capability is missing).
 
-When this extension is installed under `.specify/extensions/tdd/`, the absolute
-paths are:
-
-- `.specify/extensions/tdd/templates/tdd-loop-playbook.md`
-- `.specify/extensions/tdd/templates/tdd-test-list-template.md`
-- `.specify/extensions/tdd/templates/tdd-stack-profile.md`
+Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
+instead. That path is spec-kit's own override layer, and it is how a project tunes
+an extension's discipline without forking it.
 
 ## Workflow
 

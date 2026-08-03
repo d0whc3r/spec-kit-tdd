@@ -34,7 +34,8 @@ writes the artifacts. Nothing is hidden in a tool.
 ## Command to template map
 
 Each command reads only the references it needs, by absolute path under
-`.specify/extensions/tdd/templates/`:
+`.specify/extensions/tdd/templates/`, preferring a project override at
+`.specify/templates/overrides/<name>.md` where one exists:
 
 | Command  | Reads                                                                       |
 | -------- | --------------------------------------------------------------------------- |

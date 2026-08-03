@@ -67,22 +67,22 @@ With no input, run the full audit on the current feature.
 
 ## Templates
 
-This command reads two reference files from the installed extension. Relative to
-this command's extension root:
+This command reads two reference files from the installed extension:
 
-- Quality rubric: `templates/tdd-test-quality-rubric.md`. **This is the standard you
-  grade against.** Read it in full before Phase 1: the five questions, the evidence
-  sources, the test-first evidence classes, the test-smell catalogue with
-  severities, the mutation and deliberate-mutant procedure, the traceability check,
-  the verdict table, the report format, and the remediation task rules.
-- Test list format: `templates/tdd-test-list-template.md` (the behavior ids, states,
-  and cycle-log shape the evidence comes in).
+- Quality rubric: `.specify/extensions/tdd/templates/tdd-test-quality-rubric.md`.
+  **This is the standard you grade against.** Read it in full before Phase 1: the
+  five questions, the evidence sources, the test-first evidence classes, the
+  test-smell catalogue with severities, the mutation and deliberate-mutant
+  procedure, the traceability check, the verdict table, the report format, and the
+  remediation task rules.
+- Test list format:
+  `.specify/extensions/tdd/templates/tdd-test-list-template.md` (the behavior ids,
+  states, and cycle-log shape the evidence comes in).
 
-When this extension is installed under `.specify/extensions/tdd/`, the absolute
-paths are:
-
-- `.specify/extensions/tdd/templates/tdd-test-quality-rubric.md`
-- `.specify/extensions/tdd/templates/tdd-test-list-template.md`
+Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
+instead. That path is spec-kit's own override layer, and it is how a project tunes
+an extension's rubric without forking it. Name the file you graded against in the
+report, so a verdict can be compared to the standard that produced it.
 
 ## Workflow
 

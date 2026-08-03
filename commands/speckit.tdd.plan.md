@@ -63,24 +63,22 @@ With no input, run the full workflow on the current feature.
 
 ## Templates
 
-This command reads three reference files from the installed extension. Relative to
-this command's extension root:
+This command reads three reference files from the installed extension:
 
-- Test list format: `templates/tdd-test-list-template.md` (file placement,
+- Test list format:
+  `.specify/extensions/tdd/templates/tdd-test-list-template.md` (file placement,
   frontmatter, behavior ids and states, the list and cycle-log shapes, the quality
   bar). This is the artifact you produce; read it before writing anything.
-- Loop discipline: `templates/tdd-loop-playbook.md` (read its "Step 1: the test
-  list" and "Brownfield: characterization tests first" sections, which define what
-  belongs on a list and what a baseline behavior is).
-- Stack profile reference: `templates/tdd-stack-profile.md` (what the profile
+- Loop discipline: `.specify/extensions/tdd/templates/tdd-loop-playbook.md` (read
+  its "Step 1: the test list" and "Brownfield: characterization tests first"
+  sections, which define what belongs on a list and what a baseline behavior is).
+- Stack profile reference:
+  `.specify/extensions/tdd/templates/tdd-stack-profile.md` (what the profile
   contains, so you can copy the verification commands into the list).
 
-When this extension is installed under `.specify/extensions/tdd/`, the absolute
-paths are:
-
-- `.specify/extensions/tdd/templates/tdd-test-list-template.md`
-- `.specify/extensions/tdd/templates/tdd-loop-playbook.md`
-- `.specify/extensions/tdd/templates/tdd-stack-profile.md`
+Where `.specify/templates/overrides/<name>.md` exists for one of these, read that
+instead. That path is spec-kit's own override layer, and it is how a project tunes
+an extension's discipline without forking it.
 
 ## Workflow
 
