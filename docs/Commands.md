@@ -113,6 +113,7 @@ The loop. One behavior per cycle.
 
 ```text
 /speckit.tdd.run              # one cycle on the next PENDING behavior
+/speckit.tdd.run next         # the same thing, spelled out
 /speckit.tdd.run all          # keep cycling until the list is done
 /speckit.tdd.run U3 U4        # specific behaviors, in that order
 /speckit.tdd.run outer        # the next acceptance behavior
@@ -193,12 +194,13 @@ ordered so the blocking ones come first. Clearing them is the loop's job or your
 | a path                | `setup`          | Detect one subtree of a monorepo                          |
 | a feature name        | `plan`, `verify` | Target that feature instead of the current branch's       |
 | a behavior id         | `run`            | Run the loop on exactly those behaviors                   |
+| `next`                | `run`            | One cycle on the first `PENDING` behavior. The default    |
 | `all`                 | `run`            | Keep cycling until the list is done                       |
 | `outer`               | `run`            | Work the next acceptance behavior                         |
 | `resume`              | `run`            | Continue an interrupted cycle                             |
 | `outer-only`          | `plan`           | Acceptance behaviors only                                 |
 | `inside-out`          | `plan`           | No outer loop for this feature                            |
-| `tcr`                 | `run`            | test && commit                                            |     | revert |
+| `tcr`                 | `run`            | `test && commit \|\| revert`                              |
 | `quick`               | `verify`         | Skip mutation and deliberate mutants                      |
 | `deep`                | `verify`         | Widen mutation scope and mutant sampling                  |
 | `branch`              | `verify`         | Audit the branch's changes rather than one feature        |

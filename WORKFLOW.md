@@ -157,6 +157,7 @@ full suite, refactor while green, commit.
 
 ```text
 /speckit.tdd.run              # one cycle on the next PENDING behavior
+/speckit.tdd.run next         # the same thing, spelled out
 /speckit.tdd.run all          # keep cycling until the list is done
 /speckit.tdd.run U3 U4        # specific behaviors, in that order
 /speckit.tdd.run outer        # the next acceptance behavior

@@ -92,6 +92,7 @@ stacks:
     cwd: .
     runner: vitest
     single: 'pnpm vitest run {file} -t "{name}"'
+    file: pnpm vitest run {file}
     suite: pnpm test
     coverage: pnpm test --coverage
     mutation: 'pnpm stryker run --mutate "{files}"'

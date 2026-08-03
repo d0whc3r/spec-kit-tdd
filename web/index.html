@@ -206,7 +206,7 @@ specify extension add tdd</code></pre>
                     layout, then <strong>proves each command by running it</strong>. Once per
                     repository. Also proposes the TDD principle for your project constitution.
                   </td>
-                  <td><code>.specify/memory/tdd-profile.md</code></td>
+                  <td><code>.specify/memory/tdd-profile.md</code>, constitution (with approval)</td>
                 </tr>
                 <tr>
                   <td><code>/speckit.tdd.plan</code></td>
@@ -217,7 +217,7 @@ specify extension add tdd</code></pre>
                     before the implementation it covers.
                   </td>
                   <td>
-                    <code>specs/&lt;feature&gt;/tdd/test-list.md</code>,
+                    <code>specs/&lt;feature&gt;/tdd/test-list.md</code>, <code>cycle-log.md</code>,
                     <code>tasks.md</code>
                   </td>
                 </tr>
@@ -237,7 +237,10 @@ specify extension add tdd</code></pre>
                     rubric, mutation on the changed files, criteria coverage. Verdict: PASS,
                     PASS_WITH_GAPS, FAIL, or BLOCKED.
                   </td>
-                  <td><code>specs/&lt;feature&gt;/tdd/verification.md</code></td>
+                  <td>
+                    <code>specs/&lt;feature&gt;/tdd/verification.md</code>, remediation in
+                    <code>tasks.md</code>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -313,7 +316,8 @@ specify extension add tdd</code></pre>
 - red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
   -> `AssertionError: expected 'expired' to be undefined` (1 failed)
 - green: `src/auth/session.ts:31` changed `<` to `<=`. Suite -> 126 passed
-- refactor: extracted `isExpired(claims, now)`; suite re-run green
+- refactor: extracted `isExpired(claims, now)` from the inline comparison; suite
+  re-run green after the extraction
 - commit: `9c2b117` (behavior), `5ee0a30` (structure)
 - note: U1 alone passed with both `<` and `<=`, which is exactly why the
   boundary needed its own behavior on the list.</code></pre>

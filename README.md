@@ -42,12 +42,12 @@ The wiki is generated from [`docs/`](docs/) on every push to `main`. To browse t
 
 ## At a glance
 
-| Command               | What it does                                                                                                                               | Writes                                                      |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| `/speckit.tdd.setup`  | Detects the test stack and proves each command by running it. Once per repository.                                                         | `.specify/memory/tdd-profile.md`, constitution (on request) |
-| `/speckit.tdd.plan`   | Turns acceptance criteria and plan components into a test list, then makes the test tasks in `tasks.md` mandatory and correctly ordered.   | `specs/<feature>/tdd/test-list.md`, `tasks.md`              |
-| `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                                 | tests, source, `specs/<feature>/tdd/cycle-log.md`           |
-| `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation testing on the changed files, criteria coverage. Fails closed. | `specs/<feature>/tdd/verification.md`, remediation tasks    |
+| Command               | What it does                                                                                                                               | Writes                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `/speckit.tdd.setup`  | Detects the test stack and proves each command by running it. Once per repository.                                                         | `.specify/memory/tdd-profile.md`, constitution (with approval)   |
+| `/speckit.tdd.plan`   | Turns acceptance criteria and plan components into a test list, then makes the test tasks in `tasks.md` mandatory and correctly ordered.   | `specs/<feature>/tdd/test-list.md`, `cycle-log.md`, `tasks.md`   |
+| `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                                 | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
+| `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation testing on the changed files, criteria coverage. Fails closed. | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
 
 `plan` runs automatically after `/speckit.tasks` and `verify` after
 `/speckit.implement`, both as optional hooks you can decline.

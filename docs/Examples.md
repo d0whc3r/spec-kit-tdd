@@ -70,7 +70,8 @@ One entry per cycle. The `red` line is the point:
 - red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
   -> `AssertionError: expected 'expired' to be undefined` (1 failed)
 - green: `src/auth/session.ts:31` changed `<` to `<=`. Suite -> 126 passed
-- refactor: extracted `isExpired(claims, now)`; suite re-run green after the extraction
+- refactor: extracted `isExpired(claims, now)` from the inline comparison; suite
+  re-run green after the extraction
 - commit: `9c2b117` (behavior), `5ee0a30` (structure)
 ```
 
