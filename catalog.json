@@ -1,0 +1,39 @@
+{
+  "name": "TDD Extension",
+  "id": "tdd",
+  "description": "Drives spec-kit implementation with tests: a language-agnostic red-green-refactor loop with a per-feature test list, recorded red and green evidence, and mutation-checked test strength.",
+  "author": "d0whc3r",
+  "version": "0.1.0",
+  "download_url": "https://github.com/d0whc3r/spec-kit-tdd/releases/download/v0.1.0/tdd-0.1.0.zip",
+  "repository": "https://github.com/d0whc3r/spec-kit-tdd",
+  "homepage": "https://d0whc3r.github.io/spec-kit-tdd/",
+  "documentation": "https://github.com/d0whc3r/spec-kit-tdd/wiki",
+  "changelog": "https://github.com/d0whc3r/spec-kit-tdd/blob/main/CHANGELOG.md",
+  "license": "MIT",
+  "category": "process",
+  "effect": "read-write",
+  "requires": {
+    "speckit_version": ">=0.2.0"
+  },
+  "provides": {
+    "commands": 4,
+    "hooks": 2
+  },
+  "tags": [
+    "acceptance-tests",
+    "mutation-testing",
+    "property-based-testing",
+    "quality",
+    "red-green-refactor",
+    "spec-kit",
+    "spec-kit-extension",
+    "tdd",
+    "test-driven-development",
+    "test-first",
+    "testing",
+    "unit-tests"
+  ],
+  "verified": false,
+  "created_at": "2026-08-03T00:00:00Z",
+  "updated_at": "2026-08-03T00:00:00Z"
+}
