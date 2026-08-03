@@ -157,8 +157,9 @@ Commands actually shipped:
   /speckit.tdd.plan    criteria -> test list        writes tdd/test-list.md, tasks.md
   /speckit.tdd.run     the loop                     writes tests, source, tdd/cycle-log.md
   /speckit.tdd.verify  the cold audit               writes tdd/verification.md, tasks.md
-Hooks declared: after_tasks -> plan, after_implement -> verify
-Version: 0.1.0  Requires: speckit >= 0.2.0
+Hooks declared: after_tasks -> plan (optional), before_implement -> run
+                (mandatory), after_implement -> verify (optional)
+Version: <extension.yml version>  Requires: <requires.speckit_version>
 ```
 
 ### Phase 2: Inventory the user-facing layer
