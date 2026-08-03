@@ -74,20 +74,12 @@ export async function renderCatalogIssue({
   const newIssueUrl = `https://github.com/${upstreamRepo}/issues/new/choose`;
   const titleQuery = title.replaceAll(" ", "+");
 
-  const proposedEntry = JSON.stringify(
-    {
-      [id]: {
-        ...catalog,
-        version: v,
-        download_url: url,
-        verified: false,
-        downloads: 0,
-        stars: 0,
-      },
-    },
-    null,
-    2,
-  );
+  // downloads, stars, and verified belong to the upstream maintainers: emitting
+  // our local zeros would ask them to reset their own counters. Drop them and
+  // let the existing upstream values stand.
+  const entry = { ...catalog, version: v, download_url: url };
+  for (const owned of ["downloads", "stars", "verified"]) delete entry[owned];
+  const proposedEntry = JSON.stringify({ [id]: entry }, null, 2);
 
   const features = keyFeatures(catalog.provides?.commands, docs);
 
