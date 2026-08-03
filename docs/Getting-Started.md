@@ -17,7 +17,7 @@ Install directly from the latest release. No catalog setup, and this is the only
 way to pin a version:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.0.0/tdd-1.0.0.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.0/tdd-1.1.0.zip
 ```
 
 Confirm it registered:

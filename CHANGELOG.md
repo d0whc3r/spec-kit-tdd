@@ -1,5 +1,17 @@
 # Changelog
 
+# [1.1.0](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.0.0...v1.1.0) (2026-08-03)
+
+
+### Bug Fixes
+
+* **commands:** resolve the feature through spec-kit's own resolver ([a98ad7c](https://github.com/d0whc3r/spec-kit-tdd/commit/a98ad7c5122b7502cc11bc304ee1fc6c4f30ce51))
+
+
+### Features
+
+* offer the loop before /speckit.implement writes code ([004e07a](https://github.com/d0whc3r/spec-kit-tdd/commit/004e07a29b4a4e516294be4af1d1cc3b93b1d823))
+
 # 1.0.0 (2026-08-03)
 
 
