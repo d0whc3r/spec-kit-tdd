@@ -25,11 +25,14 @@ specs/<feature>/
 ```
 
 `<feature>` is spec-kit's own feature directory name (for example
-`003-user-auth`), never a name this extension invents. When more than one feature
-directory exists, the current one is resolved the way spec-kit resolves it: the
-feature matching the current branch, falling back to the most recently modified
-`specs/*/spec.md` when the branch does not map to one. If neither resolves, ask
-rather than guess.
+`003-user-auth`), never a name this extension invents. Resolve it with spec-kit's
+own resolver rather than a heuristic: run
+`.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
+`powershell` or `python` variant the project installed) and take `FEATURE_DIR`
+from its JSON. spec-kit reads the feature from `SPECIFY_FEATURE_DIRECTORY`, then
+`.specify/feature.json`, and errors when neither is set. If the script is absent
+or errors, ask rather than guess, and never infer the feature from the branch name
+or from file timestamps.
 
 There is no index file across features. Commands discover state by globbing
 `specs/*/tdd/test-list.md` and reading frontmatter.

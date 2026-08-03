@@ -26,9 +26,10 @@ specs/<feature>/
 ```
 
 `<feature>` is spec-kit's own directory name (for example `003-user-auth`), never one
-this extension invents. The current feature is resolved the way spec-kit resolves it:
-the one matching the current branch, falling back to the most recently modified
-`specs/*/spec.md`. If neither resolves, the command asks.
+this extension invents. The current feature comes from spec-kit's own resolver:
+`FEATURE_DIR` out of `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`,
+which reads `SPECIFY_FEATURE_DIRECTORY` first and `.specify/feature.json` second. If
+neither is set, the command asks rather than guessing from the branch name.
 
 There is no index across features. Commands glob `specs/*/tdd/test-list.md` and read
 frontmatter.

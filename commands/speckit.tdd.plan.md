@@ -26,7 +26,7 @@ You **MUST** consider the user input before proceeding (if not empty). Recognize
 modifiers, composable unless stated otherwise:
 
 - A feature directory name (for example `003-user-auth`): plan that feature instead
-  of the one resolved from the current branch.
+  of the one spec-kit currently resolves to.
 - `refresh`: a test list already exists. Re-derive it against the current `spec.md`
   and `plan.md`, preserving existing behavior ids and states. See "Re-running on an
   existing list".
@@ -89,9 +89,14 @@ paths are:
 - Read `.specify/memory/tdd-profile.md`. If absent, stop per Hard Rule 5. If its
   `detected_at` is far behind `HEAD` and the manifests or CI config changed since,
   say so and suggest `/speckit.tdd.setup refresh`, then continue with what it has.
-- Resolve the feature directory the way spec-kit does: the one matching the current
-  branch, falling back to the most recently modified `specs/*/spec.md`. If neither
-  resolves, or several match, ask instead of guessing.
+- Resolve the feature directory with spec-kit's own resolver, not a guess: run
+  `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
+  `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
+  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
+  then `.specify/feature.json`, and errors when neither is set. If the script is
+  absent or errors, ask which feature to plan. Never infer the feature from the
+  branch name or from file timestamps: a test list written into the wrong feature
+  directory is a silent failure.
 - Confirm `spec.md` exists. `plan.md` is needed for the inner loop; without it,
   run `outer-only` and say so.
 - Read `.specify/memory/constitution.md` if present. A constitution principle about

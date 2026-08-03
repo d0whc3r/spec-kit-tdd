@@ -105,9 +105,15 @@ paths are:
 - Read `.specify/memory/tdd-profile.md`. If absent, stop: run `/speckit.tdd.setup`
   first. Take the single-test, suite, and (where present) coverage and mutation
   commands, and the conventions and exemplar test file from its body.
-- Resolve the feature the way spec-kit does (current branch, else the most recently
-  modified `specs/*/spec.md`). Read `specs/<feature>/tdd/test-list.md`. If absent,
-  stop: run `/speckit.tdd.plan` first.
+- Resolve the feature directory with spec-kit's own resolver, not a guess: run
+  `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
+  `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
+  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
+  then `.specify/feature.json`, and errors when neither is set. If the script is
+  absent or errors, ask which feature to work on. Never infer the feature from the
+  branch name or from file timestamps.
+- Read `specs/<feature>/tdd/test-list.md`. If absent, stop: run
+  `/speckit.tdd.plan` first.
 - Read `spec.md` for the criteria the behaviors trace to. When a test and the code
   disagree later, this is what decides which is wrong.
 - Read the exemplar test file named in the profile. Every test you write must look

@@ -221,8 +221,12 @@ verdict moved.
 
 ### The wrong feature was used
 
-Resolution follows spec-kit: the feature matching the current branch, falling back to the
-most recently modified `specs/*/spec.md`. Pass the directory name explicitly to override:
+Resolution is spec-kit's, not the extension's. The commands read `FEATURE_DIR` from
+`.specify/scripts/bash/check-prerequisites.sh --json --paths-only`, which resolves
+`SPECIFY_FEATURE_DIRECTORY` first, then `.specify/feature.json`. If the wrong feature came
+out, that is the state to fix: set `SPECIFY_FEATURE_DIRECTORY`, or re-run
+`/speckit.specify` so `feature.json` points where you expect. Pass the directory name
+explicitly to override for one call:
 
 ```text
 /speckit.tdd.plan 003-user-auth

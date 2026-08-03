@@ -192,7 +192,7 @@ ordered so the blocking ones come first. Clearing them is the loop's job or your
 | --------------------- | ---------------- | --------------------------------------------------------- |
 | `refresh`             | `setup`, `plan`  | Re-detect or re-derive, preserving ids, reporting changes |
 | a path                | `setup`          | Detect one subtree of a monorepo                          |
-| a feature name        | `plan`, `verify` | Target that feature instead of the current branch's       |
+| a feature name        | `plan`, `verify` | Target that feature instead of the resolved one           |
 | a behavior id         | `run`            | Run the loop on exactly those behaviors                   |
 | `next`                | `run`            | One cycle on the first `PENDING` behavior. The default    |
 | `all`                 | `run`            | Keep cycling until the list is done                       |

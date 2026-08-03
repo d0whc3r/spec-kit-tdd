@@ -25,7 +25,7 @@ You **MUST** consider the user input before proceeding (if not empty). Recognize
 modifiers, composable unless stated otherwise:
 
 - A feature directory name (for example `003-user-auth`): audit that feature instead
-  of the one resolved from the current branch.
+  of the one spec-kit currently resolves to.
 - `quick`: skip Phase 4 (mutation and deliberate mutants). Faster, and the verdict
   can be at best `PASS_WITH_GAPS`, with test strength recorded as unmeasured.
 - `deep`: widen Phase 4. Mutation across every file the feature touched rather than
@@ -91,7 +91,15 @@ paths are:
 - Read `.specify/memory/tdd-profile.md` for the suite, coverage, and mutation
   commands and the test layout. If absent, the audit is `BLOCKED`: say what is
   needed and stop.
-- Resolve the feature and read `specs/<feature>/tdd/test-list.md`. If it is absent,
+- Resolve the feature directory with spec-kit's own resolver, not a guess: run
+  `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` (or the
+  `powershell` or `python` variant your project installed) and take `FEATURE_DIR`
+  from its JSON. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`,
+  then `.specify/feature.json`, and errors when neither is set. If the script is
+  absent or errors, ask which feature to audit. Never infer the feature from the
+  branch name or from file timestamps: auditing the wrong feature produces a
+  confident verdict about work nobody asked about.
+- Read `specs/<feature>/tdd/test-list.md`. If it is absent,
   the feature was not planned through this extension. You can still audit the
   tests against `spec.md` (say so, and expect a weaker verdict on ordering), but
   there is no per-behavior evidence to check.
