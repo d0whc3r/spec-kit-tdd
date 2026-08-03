@@ -7,7 +7,7 @@ What the extension is, and what happens when you run a command.
 The release zip contains Markdown and nothing else:
 
 ```
-extension.yml                          the manifest: 4 commands, 2 hooks
+extension.yml                          the manifest: 4 commands, 3 hooks
 README.md
 LICENSE
 commands/
@@ -97,15 +97,24 @@ applied and restored, and the restore is verified by re-running the suite.
 ```yaml
 hooks:
   after_tasks: speckit.tdd.plan
+  before_implement: speckit.tdd.run
   after_implement: speckit.tdd.verify
 ```
 
-Both are `optional: true`, so spec-kit prompts before running them and you can decline.
-They exist because those are the two moments the discipline is most often skipped: right
-after tasks are generated (when tests are still marked optional) and right after
-implementation (when the suite is green and nobody wants to look closer).
+All three are `optional: true`, so spec-kit prompts and you can decline. An optional hook
+never runs itself; it prints the command and lets you choose. They sit at the three moments
+the discipline is most often skipped:
 
-`/speckit.tdd.run` is deliberately not hooked. It is the command you drive.
+- **`after_tasks`.** Tasks have just been generated with tests still marked optional. This
+  is where the test list gets derived and the optionality removed.
+- **`before_implement`.** The next step writes code. Without a prompt here the core
+  lifecycle would implement the whole feature outside the loop, and the audit would only
+  find out afterwards. Accepting it runs `/speckit.tdd.run` over the behavioral tasks;
+  `/speckit.implement` then covers the tasks that are not behavior changes.
+- **`after_implement`.** The suite is green and nobody wants to look closer. This is where
+  the audit runs.
+
+`/speckit.tdd.run` is offered, never forced. It is still the command you drive.
 
 ## Why the boundaries are split this way
 

@@ -71,8 +71,7 @@ Nothing changes here. Use the core lifecycle:
 /speckit.tdd.plan
 ```
 
-If you left hooks enabled, this already ran after `/speckit.tasks` and asked
-first.
+If you left hooks enabled, `/speckit.tasks` already offered this and asked first.
 
 It writes `specs/<feature>/tdd/test-list.md`: one acceptance behavior per
 acceptance criterion (the outer loop), the unit behaviors each component owns (the

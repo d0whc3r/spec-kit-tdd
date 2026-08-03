@@ -243,7 +243,9 @@ the acceptance test to match.
 Report at the end:
 
 1. Behaviors completed this session, each with its red-to-green evidence in one
-   line, plus the commits.
+   line, plus the commits, plus the `tasks.md` task ids those behaviors cover. The
+   loop does not tick task checkboxes, so naming them is what stops
+   `/speckit.implement` from redoing work the loop already finished.
 2. Behaviors added to the list mid-loop, and why.
 3. The suite state now: counts and wall time.
 4. Anything blocked or deviating: splits, reverts, test-after admissions,

@@ -246,9 +246,11 @@ specify extension add tdd</code></pre>
             </table>
           </div>
           <p class="note">
-            Two hooks fire automatically if you leave them enabled, and both ask first:
-            <code>after_tasks</code> runs <code>plan</code>, <code>after_implement</code> runs
-            <code>verify</code>. Those are the two moments the discipline is most often skipped.
+            Three hooks offer the right command at the right moment if you leave them enabled, and
+            each asks first: <code>after_tasks</code> offers <code>plan</code>,
+            <code>before_implement</code> offers <code>run</code>,
+            <code>after_implement</code> offers <code>verify</code>. Those are the three moments the
+            discipline is most often skipped.
           </p>
           <p class="note">
             Modifiers: <code>refresh</code> re-detects or re-derives, <code>all</code> keeps the
@@ -514,12 +516,13 @@ ls .specify/extensions/tdd          # extension files present</code></pre>
                                  (after_tasks hook)         tdd/cycle-log.md (baseline)
       |                                                     tasks.md (tests mandatory, ordered)
       v
-                                 /speckit.tdd.run      --&gt;  tests + source
-                                 red -&gt; green               tdd/cycle-log.md (one entry per cycle)
-                                 -&gt; refactor -&gt; commit      tdd/test-list.md (states -&gt; DONE)
+/speckit.implement          --&gt;  /speckit.tdd.run      --&gt;  tests + source
+  (before it starts)             (before_implement hook)    tdd/cycle-log.md (one entry per cycle)
+                                 red -&gt; green               tdd/test-list.md (states -&gt; DONE)
+                                 -&gt; refactor -&gt; commit
 
 /speckit.implement          --&gt;  /speckit.tdd.verify   --&gt;  tdd/verification.md (verdict)
-                                 (after_implement hook)     tasks.md (remediation phase)</code></pre>
+  (after it finishes)            (after_implement hook)     tasks.md (remediation phase)</code></pre>
           <p class="note">
             The outer loop is the feature's acceptance criteria, measured in hours. The inner loop
             is the components beneath them, measured in minutes. The acceptance test is written

@@ -17,7 +17,7 @@
   },
   "provides": {
     "commands": 4,
-    "hooks": 2
+    "hooks": 3
   },
   "tags": [
     "acceptance-tests",

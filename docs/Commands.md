@@ -11,8 +11,9 @@ work is not the command that does it.
 | [`/speckit.tdd.run`](#speckittddrun)       | the implementation phase | the test list, the profile, `spec.md`                          | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
 | [`/speckit.tdd.verify`](#speckittddverify) | after the loop           | the cycle log, git history, the tests and source as they stand | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
 
-Two hooks fire automatically if you leave them enabled, and both ask first:
-`after_tasks` runs `plan`, `after_implement` runs `verify`.
+Three hooks offer the right command at the right moment if you leave them enabled,
+and each asks first: `after_tasks` offers `plan`, `before_implement` offers `run`,
+`after_implement` offers `verify`.
 
 ---
 

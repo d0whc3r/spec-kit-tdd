@@ -52,9 +52,10 @@ bug.
 | `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                     | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
 | `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation on changed files, criteria coverage. Fails closed. | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
 
-`plan` runs automatically after `/speckit.tasks`, `verify` after
-`/speckit.implement`. Both are optional hooks you can decline. All modifiers are
-covered in [Commands](Commands.md).
+Three optional hooks offer the right command at the right moment: `plan` after
+`/speckit.tasks`, `run` before `/speckit.implement` starts writing code, and
+`verify` after it finishes. You can decline any of them. All modifiers are covered
+in [Commands](Commands.md).
 
 ## Hard rules
 

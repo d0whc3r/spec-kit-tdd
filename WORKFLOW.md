@@ -77,12 +77,12 @@ auditor that edits the code it grades cannot be trusted about it.
        |                          (after_tasks hook)     behaviors           cycle-log.md (baseline)
        |                                                                     tasks.md (tests mandatory, ordered)
        v
-                               /speckit.tdd.run     ->  red -> green    ->  cycle-log.md (one entry per cycle)
-                                                        -> refactor          test-list.md (state -> DONE)
+ /speckit.implement        ->  /speckit.tdd.run     ->  red -> green    ->  cycle-log.md (one entry per cycle)
+   (before it starts)          (before_implement hook)  -> refactor          test-list.md (state -> DONE)
                                                         -> commit            tests + source in the working tree
 
  /speckit.implement        ->  /speckit.tdd.verify  ->  evidence,       ->  verification.md (verdict)
-                               (after_implement hook)   smells,             tasks.md (remediation phase)
+   (after it finishes)         (after_implement hook)   smells,             tasks.md (remediation phase)
                                                         mutants
 ```
 
@@ -97,7 +97,7 @@ A typical feature, start to finish:
 2. /speckit.specify, /speckit.clarify, /speckit.plan, /speckit.tasks
 3. /speckit.tdd.plan                       (or accept the after_tasks hook)
 4. Read specs/<feature>/tdd/test-list.md   (it is meant to be reviewed)
-5. /speckit.tdd.run all                    (or one behavior at a time)
+5. /speckit.tdd.run all                    (or accept the before_implement hook)
 6. /speckit.tdd.verify                     (or accept the after_implement hook)
 7. Clear any remediation tasks, then re-run /speckit.tdd.verify
 ```

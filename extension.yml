@@ -34,6 +34,11 @@ hooks:
     optional: true
     prompt: "Derive the TDD test list and make the test tasks in tasks.md mandatory?"
     description: "Generate specs/<feature>/tdd/test-list.md from spec.md and plan.md, then reorder tasks.md so every behavior has a failing test before its implementation"
+  before_implement:
+    command: speckit.tdd.run
+    optional: true
+    prompt: "Drive the behavioral tasks through the red-green-refactor loop first?"
+    description: "Run the loop over the behaviors on specs/<feature>/tdd/test-list.md, one failing test at a time with the red recorded, then use /speckit.implement for the tasks that are not behavior changes"
   after_implement:
     command: speckit.tdd.verify
     optional: true

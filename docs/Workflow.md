@@ -18,12 +18,13 @@ Where the loop sits in the spec-kit lifecycle, and what it leaves behind.
                                  (after_tasks hook)          specs/<feature>/tdd/cycle-log.md (baseline)
                                                              specs/<feature>/tasks.md (tests mandatory)
 
-                                 /speckit.tdd.run        ->  tests + source in the working tree
-                                 red -> green -> refactor    cycle-log.md (one entry per cycle)
-                                 one commit per cycle        test-list.md (states -> DONE)
+ /speckit.implement          ->  /speckit.tdd.run        ->  tests + source in the working tree
+   (before it starts)            (before_implement hook)     cycle-log.md (one entry per cycle)
+                                 red -> green -> refactor    test-list.md (states -> DONE)
+                                 one commit per cycle
 
  /speckit.implement          ->  /speckit.tdd.verify     ->  specs/<feature>/tdd/verification.md
-                                 (after_implement hook)      tasks.md (remediation phase)
+   (after it finishes)           (after_implement hook)      tasks.md (remediation phase)
 ```
 
 `setup` is independent of any feature. Everything from `plan` onward is per feature,
@@ -41,6 +42,11 @@ covers, so the core command follows the same ordering. Use it when the feature h
 a lot of non-behavioral work (scaffolding, configuration, wiring) that does not
 belong in a red-green cycle, and reach for `/speckit.tdd.run` on the behavioral
 tasks.
+
+The `before_implement` hook is what makes that choice explicit: `/speckit.implement`
+asks once whether to run the loop over the behavioral tasks first. The loop does not
+tick task checkboxes, so it reports the task ids it covered and you pass the rest to
+`/speckit.implement`.
 
 Either way, `/speckit.tdd.verify` grades the result the same way. The difference is
 only how much of the ordering is enforced per cycle rather than per task.

@@ -49,8 +49,9 @@ The wiki is generated from [`docs/`](docs/) on every push to `main`. To browse t
 | `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                                 | tests, source, `specs/<feature>/tdd/cycle-log.md`                |
 | `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation testing on the changed files, criteria coverage. Fails closed. | `specs/<feature>/tdd/verification.md`, remediation in `tasks.md` |
 
-`plan` runs automatically after `/speckit.tasks` and `verify` after
-`/speckit.implement`, both as optional hooks you can decline.
+Three optional hooks offer the right command at the right moment, and you can decline
+any of them: `plan` after `/speckit.tasks`, `run` before `/speckit.implement` starts
+writing code, and `verify` after it finishes.
 
 ## What it enforces
 
