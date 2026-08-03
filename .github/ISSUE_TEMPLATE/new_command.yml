@@ -1,0 +1,68 @@
+name: New command proposal
+description: Propose a new /speckit.tdd.* command. Adding a command is a breaking change and requires lockstep updates to the canonical file, extension.yml, and catalog.json.
+title: "feat(command): <command name>"
+labels: ["enhancement", "command", "needs-triage", "breaking"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Adding a command touches the canonical file, `extension.yml`, and `catalog.json`. Read `AGENTS.md` before filing.
+
+  - type: input
+    id: command-name
+    attributes:
+      label: Proposed command name
+      placeholder: speckit.tdd.<verb>
+    validations:
+      required: true
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: One paragraph. Why does this command need to exist? Which audience is it for?
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs-outputs
+    attributes:
+      label: Inputs and outputs
+      description: Which files does it read, which files does it write, and what format does it produce?
+      placeholder: |
+        Reads: .specify/memory/tdd-profile.md, specs/<feature>/spec.md, specs/<feature>/tdd/test-list.md
+        Writes: specs/<feature>/tdd/<artifact>.md
+        Format: per templates/tdd-test-list-template.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: advisor-boundary
+    attributes:
+      label: Command boundary
+      description: Confirm which files the command may write, and that it keeps the extension's founding rule. Only `/speckit.tdd.run` writes tests or source, and only under the red-green-refactor discipline. A command that grades work must not also fix it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: lockstep-plan
+    attributes:
+      label: Lockstep update plan
+      description: Confirm you will update the canonical file plus `extension.yml`, `catalog.json`, and the manifest validator.
+      value: |
+        - [ ] commands/speckit.tdd.<verb>.md (canonical)
+        - [ ] extension.yml provides.commands
+        - [ ] catalog.json provides.commands count
+        - [ ] .github/scripts/validate-manifest.mjs REQUIRED list
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I confirm this command does not duplicate an existing one.
+          required: true
+        - label: I understand a new command is a breaking change requiring a `feat!` or `BREAKING CHANGE` commit.
+          required: true

@@ -1,0 +1,31 @@
+# CODEOWNERS for spec-kit-tdd
+# Owners are requested for review automatically on matching paths.
+# See: https://docs.github.com/articles/about-code-owners
+
+# Fallback owner for everything not explicitly listed below.
+*                                       @d0whc3r
+
+# Canonical command surface and agent mirrors. Changes here must respect the
+# agent-boundary rule in AGENTS.md.
+/commands/                              @d0whc3r
+/.claude/skills/                        @d0whc3r
+/.agents/skills/                        @d0whc3r
+/.specify/integrations/                 @d0whc3r
+
+# Extension manifest, catalog, and release tooling.
+/extension.yml                          @d0whc3r
+/catalog.json                           @d0whc3r
+/.releaserc.json                        @d0whc3r
+/.github/workflows/                     @d0whc3r
+/.github/scripts/                       @d0whc3r
+
+# Templates that ship with the extension.
+/templates/                             @d0whc3r
+
+# Project-wide policy documents.
+/AGENTS.md                              @d0whc3r
+/CLAUDE.md                              @d0whc3r
+/CONTRIBUTING.md                        @d0whc3r
+/CODE_OF_CONDUCT.md                     @d0whc3r
+/SECURITY.md                            @d0whc3r
+/SUPPORT.md                             @d0whc3r

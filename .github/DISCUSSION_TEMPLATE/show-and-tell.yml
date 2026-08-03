@@ -1,0 +1,26 @@
+title: "[Show] <project or artifact>"
+labels: ["show-and-tell"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you build
+      description: Link to the artifact, repo, or screenshot. Tell us what the extension did for you.
+    validations:
+      required: true
+
+  - type: textarea
+    id: how
+    attributes:
+      label: How it went
+      description: Which commands you used, what worked, what you had to fix by hand.
+    validations:
+      required: false
+
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Feedback for the extension
+      description: Anything you would change about the templates, prompts, or generated output.
+    validations:
+      required: false

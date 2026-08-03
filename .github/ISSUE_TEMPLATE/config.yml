@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/d0whc3r/spec-kit-tdd/discussions
+    about: Ask a question, share an idea, or discuss usage patterns.
+  - name: Spec Kit core
+    url: https://github.com/github/spec-kit
+    about: Issues with Spec Kit itself (not this extension) belong upstream.
+  - name: Security report
+    url: https://github.com/d0whc3r/spec-kit-tdd/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue.

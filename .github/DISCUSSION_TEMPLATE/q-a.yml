@@ -1,0 +1,34 @@
+title: "[Q] <short summary>"
+labels: ["question"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: What are you trying to do
+      description: Goal first, then what you have tried.
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: What is happening
+      description: Generated artifact, error, or unexpected behavior. Use code fences.
+    validations:
+      required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+      placeholder: "0.1.1"
+    validations:
+      required: false
+
+  - type: input
+    id: agent
+    attributes:
+      label: AI agent
+      placeholder: Claude Code / Copilot / Codex
+    validations:
+      required: false

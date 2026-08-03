@@ -1,0 +1,37 @@
+name: ci
+
+# Run the project's validation gate on every pull request, so manifest,
+# content-lint, formatting, metadata-sync, and site-build
+# regressions are caught before merge instead of on the release run on main.
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Read-only: this workflow only validates, it never writes to the repo.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check (validate, sync, lint, lint:content)
+        run: pnpm run check
+
+      - name: Build website
+        run: pnpm web:build

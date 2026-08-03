@@ -1,0 +1,57 @@
+name: render-catalog-issue
+description: Render the upstream Spec Kit catalog submission issue and upload it as an artifact for manual filing.
+# To reproduce locally, run the same renderer: `pnpm run catalog:issue`
+# (wraps .github/scripts/submit-catalog-update.mjs). It writes
+# upstream-catalog-issue-v<version>.md to the repo root.
+
+inputs:
+  version:
+    description: Extension version (e.g. 0.2.0). Defaults to catalog.json .version.
+    required: false
+    default: ""
+  release-type:
+    description: Release type label embedded in the issue body.
+    required: false
+    default: release
+  git-tag:
+    description: Git tag used in the release download URL. Defaults to v<version>.
+    required: false
+    default: ""
+  artifact-name:
+    description: Name of the uploaded artifact.
+    required: false
+    default: upstream-catalog-issue
+
+outputs:
+  file:
+    description: Path to the rendered markdown document.
+    value: ${{ steps.render.outputs.file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Render catalog issue
+      id: render
+      shell: bash
+      env:
+        GITHUB_REPOSITORY: ${{ github.repository }}
+      run: |
+        version="${{ inputs.version }}"
+        [ -n "$version" ] || version=$(jq -r .version catalog.json)
+        tag="${{ inputs.git-tag }}"
+        [ -n "$tag" ] || tag="v${version}"
+        out="upstream-catalog-issue-v${version}.md"
+        OUTPUT_FILE="$out" node .github/scripts/submit-catalog-update.mjs "$version" "${{ inputs.release-type }}" "$tag"
+        echo "file=$out" >> "$GITHUB_OUTPUT"
+
+    - name: Publish catalog issue to job summary
+      shell: bash
+      run: cat "${{ steps.render.outputs.file }}" >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload catalog issue
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.render.outputs.file }}
+        if-no-files-found: error
+        retention-days: 7

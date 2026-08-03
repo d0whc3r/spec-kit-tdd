@@ -1,0 +1,113 @@
+name: Bug report
+description: A command, hook, or generated artifact behaves incorrectly.
+title: "bug: <short summary>"
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Please fill in every section so we can reproduce it quickly.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences. What did you try to do, and what happened instead?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: command
+    attributes:
+      label: Affected command
+      description: Which extension command exposed the bug? Pick "Other" for manifest or template issues.
+      options:
+        - /speckit.tdd.setup
+        - /speckit.tdd.plan
+        - /speckit.tdd.run
+        - /speckit.tdd.verify
+        - Manifest or catalog
+        - Templates
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: agent
+    attributes:
+      label: AI agent
+      description: Which host agent were you using when the bug occurred?
+      options:
+        - Claude Code
+        - Spec Kit core CLI
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+      description: Run `cat extension.yml | grep version` or check the release tag.
+      placeholder: "0.1.1"
+    validations:
+      required: true
+
+  - type: input
+    id: speckit-version
+    attributes:
+      label: Spec Kit version
+      description: Spec Kit core version in the host project.
+      placeholder: "0.2.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Exact steps a maintainer can follow. Include the repo shape or prompt snippets that triggered the bug if relevant.
+      placeholder: |
+        1. Install the extension at version X.
+        2. Run `/speckit.tdd.setup`, then `/speckit.tdd.plan` on feature 003.
+        3. Run `/speckit.tdd.run U1`.
+        4. Observe the entry written to `specs/003-.../tdd/cycle-log.md`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Paste the generated artifact section or error message that demonstrates the bug. Use code fences.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, shell, Node version (`node -v`), pnpm version, and any other relevant tooling.
+      placeholder: |
+        macOS 15.0, zsh, Node 22.10.0, pnpm 9.12.0
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I searched existing issues and discussions and found no duplicate.
+          required: true
+        - label: The bug is in this extension, not in Spec Kit core or the AI agent itself.
+          required: true
+        - label: My report contains no secrets, customer data, or proprietary content.
+          required: true

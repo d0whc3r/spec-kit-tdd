@@ -1,0 +1,63 @@
+name: Feature request
+description: Suggest a new capability, improved output, or quality-of-life change.
+title: "feat: <short summary>"
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are scoped to the audit, the spec prompt format, and the follow-through flows (handoff to spec-kit, re-running for drift, issues). For wholly new commands, use the "New command" template instead.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is the user trying to accomplish, and where does the current extension fall short? Frame this as a Job to Be Done, not a solution.
+      placeholder: When I run /speckit.tdd.setup on a monorepo, only the root stack is detected, so the loop uses the wrong single-test command inside packages/api.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the change in concrete terms. Show the desired output shape if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you weighed and why you discarded them.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      multiple: true
+      options:
+        - /speckit.tdd.setup
+        - /speckit.tdd.plan
+        - /speckit.tdd.run
+        - /speckit.tdd.verify
+        - Templates
+        - Manifest or catalog
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I searched existing issues and discussions and found no duplicate.
+          required: true
+        - label: I read the README and confirmed this is in scope for the extension.
+          required: true
+        - label: The proposal respects the no em dash, plain English style used across the extension content.
+          required: true

@@ -1,0 +1,70 @@
+name: pages
+
+on:
+  # Deploy after every release run completes, so the published site always
+  # reflects the version-bumped files committed by semantic-release. release.yml
+  # runs on every push to main (bumping the version only when there is a
+  # releasable change), so this is the single deploy path for the website:
+  # push -> release pipeline -> Pages publishes the resulting HEAD.
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+  workflow_dispatch:
+
+# Allow the workflow to publish to GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; do not cancel an in-progress publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: deploy web/ to GitHub Pages
+    # Skip when the upstream release run failed or was cancelled; a manual
+    # dispatch has no workflow_run payload, so it always passes.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Always deploy the tip of main, i.e. the post-release commit that
+          # carries the bumped version. For workflow_run the default checkout
+          # ref is the commit that triggered release (pre-bump), so pin to main.
+          ref: main
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Build the site with Vite. web:build first stages the real example
+      # artifacts (single source of truth: /examples) into web/public so Vite
+      # copies them into the output, then bundles TS and minifies CSS/HTML into
+      # web/dist.
+      - name: Build site
+        run: pnpm web:build
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: web/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

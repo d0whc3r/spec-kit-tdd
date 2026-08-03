@@ -1,0 +1,28 @@
+name: Documentation
+description: Report a gap, error, or unclear section in the README, CONTRIBUTING, WORKFLOW, or generated artifact templates.
+title: "docs: <short summary>"
+labels: ["documentation", "needs-triage"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: File path, anchor, or URL of the documentation problem.
+      placeholder: README.md#installation
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested fix
+      description: Optional. A concrete change you would accept as a PR.
+    validations:
+      required: false

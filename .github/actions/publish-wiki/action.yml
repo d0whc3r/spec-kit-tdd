@@ -1,0 +1,33 @@
+name: publish-wiki
+description: Stage docs/ and publish to the repo's GitHub Wiki.
+
+inputs:
+  token:
+    description: Token with contents:write on the wiki repo.
+    required: true
+  source-dir:
+    description: Directory containing wiki markdown sources.
+    required: false
+    default: docs
+  staging-dir:
+    description: Temporary directory used for the staged wiki tree.
+    required: false
+    default: .wiki-staging
+  commit-message:
+    description: Commit message used on the wiki repo.
+    required: false
+    default: "docs: sync from ${{ github.sha }}"
+
+runs:
+  using: composite
+  steps:
+    - name: Stage wiki pages
+      shell: bash
+      run: node .github/scripts/stage-wiki.mjs "${{ inputs.source-dir }}" "${{ inputs.staging-dir }}"
+
+    - name: Publish to GitHub Wiki
+      uses: Andrew-Chen-Wang/github-wiki-action@v5
+      with:
+        path: ${{ inputs.staging-dir }}/
+        token: ${{ inputs.token }}
+        commit-message: ${{ inputs.commit-message }}
