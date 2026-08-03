@@ -1,0 +1,24 @@
+# Build artifacts
+dist/
+# Examples copied into the published site (single source of truth: /examples).
+# Staged into web/public so Vite copies them into the build output. Synced by
+# `pnpm examples:sync` locally and by the pages workflow on deploy.
+web/public/examples/
+.wiki-staging/
+upstream-catalog-issue-*.md
+/.specify/
+/specs/
+.agents/skills/speckit-tdd*
+.claude/skills/speckit-tdd*
+
+# Editor and OS metadata
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# Dependency caches (none expected, but defensive)
+node_modules/
+
+dist/

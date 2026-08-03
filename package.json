@@ -1,0 +1,68 @@
+{
+  "name": "spec-kit-tdd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Drives spec-kit implementation with tests: a language-agnostic red-green-refactor loop with a per-feature test list, recorded red and green evidence, and mutation-checked test strength.",
+  "keywords": [
+    "acceptance-tests",
+    "mutation-testing",
+    "property-based-testing",
+    "quality",
+    "red-green-refactor",
+    "spec-kit",
+    "spec-kit-extension",
+    "tdd",
+    "test-driven-development",
+    "test-first",
+    "testing",
+    "unit-tests"
+  ],
+  "homepage": "https://d0whc3r.github.io/spec-kit-tdd/",
+  "bugs": {
+    "url": "https://github.com/d0whc3r/spec-kit-tdd/issues"
+  },
+  "license": "MIT",
+  "author": "d0whc3r",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d0whc3r/spec-kit-tdd.git"
+  },
+  "scripts": {
+    "oxfmt": "oxfmt --no-error-on-unmatched-pattern",
+    "lint": "pnpm run oxfmt --check",
+    "lint:content": "node .github/scripts/lint-content.mjs",
+    "format": "pnpm run oxfmt --write",
+    "validate": "node .github/scripts/validate-manifest.mjs",
+    "sync": "node .github/scripts/sync-metadata.mjs",
+    "sync:check": "node .github/scripts/sync-metadata.mjs --check",
+    "build": "node .github/scripts/build-zip.mjs",
+    "catalog:issue": "node .github/scripts/submit-catalog-update.mjs",
+    "examples:sync": "rm -rf web/public/examples && cp -r examples web/public/examples",
+    "web:dev": "pnpm --filter @spec-kit-tdd/web dev",
+    "web:build": "pnpm examples:sync && pnpm --filter @spec-kit-tdd/web build",
+    "web:preview": "pnpm --filter @spec-kit-tdd/web preview",
+    "check": "pnpm run validate && pnpm run sync:check && pnpm run lint && pnpm run lint:content",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "7.0.0",
+    "@semantic-release/exec": "7.1.0",
+    "@semantic-release/git": "11.0.1",
+    "@semantic-release/github": "12.0.9",
+    "husky": "9.1.7",
+    "lint-staged": "17.3.0",
+    "oxfmt": "0.62.0",
+    "semantic-release": "25.0.8",
+    "zx": "8.8.5"
+  },
+  "lint-staged": {
+    "*": "pnpm run format"
+  },
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
+  "packageManager": "pnpm@11.20.0"
+}

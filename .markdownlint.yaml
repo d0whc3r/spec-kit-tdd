@@ -1,0 +1,29 @@
+# markdownlint config tuned for the TDD extension.
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+default: true
+
+# Allow long lines: prose in spec prompts frequently exceeds 80 cols and the
+# style contract values readability over wrap rules.
+MD013: false
+
+# Allow inline HTML in templates (e.g. blockquotes, occasional <br/>).
+MD033: false
+
+# Allow duplicate headings under different parents (Use Case 1 / Use Case 2 etc).
+MD024:
+  siblings_only: true
+
+# Trailing punctuation in headings is fine for our style.
+MD026: false
+
+# Permit emphasis used as heading-like dividers in scenarios (**Given**, **When**, **Then**).
+MD036: false
+
+# Allow bare URLs inside code blocks; templates show example URLs.
+MD034: false
+
+# Table pipe alignment style varies across files; disable the style rule.
+MD060: false
+
+# Templates use placeholder link syntax ([Label]: [URL]) that triggers false positives.
+MD053: false

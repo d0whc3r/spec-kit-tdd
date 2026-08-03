@@ -1,0 +1,49 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "# Changelog"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node .github/scripts/semantic-release-prepare.mjs ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "extension.yml",
+          "catalog.json",
+          "package.json",
+          "README.md",
+          "WORKFLOW.md",
+          "docs/Getting-Started.md",
+          "docs/FAQ.md",
+          "docs/Troubleshooting.md",
+          "web/index.html"
+        ],
+        "message": "chore(release): catalog v${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "dist/tdd-*.zip",
+            "label": "tdd-${nextRelease.version}.zip"
+          }
+        ]
+      }
+    ]
+  ]
+}
