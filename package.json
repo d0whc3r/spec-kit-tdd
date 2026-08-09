@@ -54,7 +54,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.3.0",
     "oxfmt": "0.62.0",
-    "semantic-release": "25.0.8",
+    "semantic-release": "25.0.9",
     "zx": "8.8.5"
   },
   "lint-staged": {
@@ -64,5 +64,5 @@
     "node": ">=24",
     "pnpm": ">=11"
   },
-  "packageManager": "pnpm@11.20.0"
+  "packageManager": "pnpm@11.21.0"
 }
