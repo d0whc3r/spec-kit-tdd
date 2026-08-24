@@ -12,7 +12,7 @@
   "dependencies": {
     "dompurify": "3.4.13",
     "marked": "18.0.9",
-    "mermaid": "11.16.1"
+    "mermaid": "11.17.0"
   },
   "devDependencies": {
     "typescript": "7.0.2",
