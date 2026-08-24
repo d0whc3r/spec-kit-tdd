@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "dompurify": "3.4.13",
+    "dompurify": "3.4.14",
     "marked": "18.0.9",
     "mermaid": "11.16.1"
   },
