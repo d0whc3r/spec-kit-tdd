@@ -105,7 +105,11 @@ compared to the standard that produced it.
   from its JSON. It is an absolute path and it is **not** always under `specs/`,
   so build every path below from `FEATURE_DIR` rather than from a `specs/<feature>`
   guess. spec-kit resolves the feature from `SPECIFY_FEATURE_DIRECTORY`, then
-  `.specify/feature.json`, and errors when neither is set. If the script is absent
+  `.specify/feature.json`, and errors when neither is set. If the input names a
+  feature directory (usually `specs/<name>`), resolve it against the repo root, use
+  it as `FEATURE_DIR`, and skip the script. Do not set `SPECIFY_FEATURE_DIRECTORY`
+  for this: spec-kit writes that variable into `.specify/feature.json`, which
+  changes the active feature for every later command. If the script is absent
   or errors, ask which feature to audit. Never infer the feature from the branch
   name or from file timestamps: auditing the wrong feature produces a confident
   verdict about work nobody asked about.
@@ -154,7 +158,7 @@ Then check `tasks.md` against the test list, because the checkboxes are what the
 rest of the lifecycle trusts. A task ticked `[X]` whose behavior id is not `DONE`
 on the list is a completion claim with no evidence behind it, and a `HIGH` finding.
 A behavioral task still unticked with its behavior `DONE` is the milder inverse:
-report it, since `/speckit.implement` would write that behavior a second time.
+report it, since `__SPECKIT_COMMAND_IMPLEMENT__` would write that behavior a second time.
 
 ### Phase 3: The smell pass
 

@@ -32,7 +32,7 @@ cmd_count_cat=$(grep -E '"commands"' catalog.json \
                   | sed -E 's/.*"commands"[[:space:]]*:[[:space:]]*([0-9]+).*/\1/' \
                   | head -1)
 
-hooks_ext=$(awk '/^hooks:/,/^[a-z]/' extension.yml \
+hooks_ext=$(awk '/^hooks:/{f=1;next} /^[^[:space:]]/{f=0} f' extension.yml \
               | grep -E '^[[:space:]]+[a-z_]+:[[:space:]]*$' \
               | sed -E 's/^[[:space:]]+([a-z_]+):.*$/\1/' \
               | grep -v '^command$\|^optional$\|^prompt$\|^description$' \

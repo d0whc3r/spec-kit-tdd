@@ -1,0 +1,8 @@
+# Files `specify extension add --dev` skips. Keep the installed copy equal to
+# the release zip (see INCLUDE in .github/scripts/build-zip.mjs).
+/*
+!/extension.yml
+!/README.md
+!/LICENSE
+!/commands/
+!/templates/

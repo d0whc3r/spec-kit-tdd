@@ -100,7 +100,7 @@ instead:
 - Assistant names as maintainers, and the repo governance in `AGENTS.md`
   (renames as breaking changes, the "change these files together"
   coupling).
-- `CONTRIBUTING.md` and `AGENTS.md`/`CLAUDE.md` themselves. They are the
+- `CONTRIBUTING.md` and `AGENTS.md` themselves. They are the
   contributor home and the agent-behavior file. This skill does not edit
   them. When a user-facing page needs to hand a reader off to contributor
   material, link to `CONTRIBUTING.md` with an absolute repo URL.
@@ -158,7 +158,8 @@ Commands actually shipped:
   /speckit.tdd.run     the loop                     writes tests, source, tdd/cycle-log.md
   /speckit.tdd.verify  the cold audit               writes tdd/verification.md, tasks.md
 Hooks declared: after_tasks -> plan (optional), before_implement -> run
-                (mandatory), after_implement -> verify (optional)
+                (mandatory), after_implement -> verify (optional),
+                after_converge -> plan (optional)
 Version: <extension.yml version>  Requires: <requires.speckit_version>
 ```
 
@@ -327,7 +328,7 @@ checks are clean. Do not commit; the user controls commits.
 - Do not edit `commands/`, `templates/`, `extension.yml`, `catalog.json`,
   the workflows under `.github/`, or `.specify/memory/constitution.md`.
   They are canonical.
-- Do not edit `CONTRIBUTING.md` or `AGENTS.md`/`CLAUDE.md`. They are the
+- Do not edit `CONTRIBUTING.md` or `AGENTS.md`. They are the
   contributor and agent-behavior homes.
 - Do not add release, CI, dev-install, repo-tree, or governance content
   to a user-facing page. Route it to `CONTRIBUTING.md`.

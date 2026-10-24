@@ -14,7 +14,7 @@ Besides those it writes only the feature's `tdd/test-list.md` and
 does so under a discipline that is the whole point: **the test is written first, it
 is observed failing, and the failure output is recorded before the implementation
 exists.** A cycle without recorded red evidence is a cycle that proved nothing, and
-`/speckit.tdd.verify` will say so from cold context later.
+`__SPECKIT_COMMAND_TDD_VERIFY__` will say so from cold context later.
 
 The pressure in this command is always toward doing more per step: write the test
 and the code together, take a big step because the answer is obvious, fix a second
@@ -34,7 +34,7 @@ modifiers, composable unless stated otherwise:
   behaviors, in the order given, instead of the next pending one.
 - `all` (the default): keep cycling until every behavior is `DONE`, the list is
   blocked, or an escape hatch fires. Report after each cycle so progress is
-  visible. This is the default because `/speckit.implement` invokes this command
+  visible. This is the default because `__SPECKIT_COMMAND_IMPLEMENT__` invokes this command
   with no arguments through the `before_implement` hook, and it must drive every
   behavior rather than one.
 - `next`: one cycle on the first `PENDING` behavior in list order, then stop and
@@ -113,7 +113,7 @@ presets sit above extensions precisely so a preset can override this text.
 
 ### Phase 0: Preflight, once per session
 
-- Read `.specify/memory/tdd-profile.md`. If absent, stop: run `/speckit.tdd.setup`
+- Read `.specify/memory/tdd-profile.md`. If absent, stop: run `__SPECKIT_COMMAND_TDD_SETUP__`
   first. Take the single-test, suite, and (where present) coverage and mutation
   commands, and the conventions, the exemplar for each test kind, and the helper
   paths from its body.
@@ -126,16 +126,16 @@ presets sit above extensions precisely so a preset can override this text.
   `.specify/feature.json`, and errors when neither is set. If the script is absent
   or errors, ask which feature to work on. Never infer the feature from the branch
   name or from file timestamps.
-- Read `FEATURE_DIR/tdd/test-list.md`. If absent, stop: run `/speckit.tdd.plan`
+- Read `FEATURE_DIR/tdd/test-list.md`. If absent, stop: run `__SPECKIT_COMMAND_TDD_PLAN__`
   first, and say that the implementation phase must not continue until the list
   exists. That message matters when this command was invoked by the
   `before_implement` hook: without it the caller writes the feature test-after.
 - Read `FEATURE_DIR/tasks.md` and build the map from behavior id to task id.
-  `/speckit.tdd.plan` writes the behavior id into the task text (for example
+  `__SPECKIT_COMMAND_TDD_PLAN__` writes the behavior id into the task text (for example
   `[U3]`), and that marker is the only link between the two files. Phase 6 needs
   it, and a task with no marker is not this command's work. If `tasks.md` is absent,
   or no task carries a marker (the list was planned with `--no-tasks`), skip the
-  ticking in Phase 6 and say so in the report: whoever runs `/speckit.implement`
+  ticking in Phase 6 and say so in the report: whoever runs `__SPECKIT_COMMAND_IMPLEMENT__`
   next needs to know it will treat the loop's work as still open.
 - Read `spec.md` (`FEATURE_SPEC` from the same JSON) for the criteria the behaviors
   trace to. When a test and the code disagree later, this is what decides which is
@@ -185,7 +185,7 @@ Never double the unit under test.
 
 Before writing a fixture, a builder, or a matcher, check the profile's helper
 paths for one that already exists. Reusing it is what keeps the suite readable as
-one suite, and `/speckit.tdd.verify` reports a hand-rolled equivalent as a smell.
+one suite, and `__SPECKIT_COMMAND_TDD_VERIFY__` reports a hand-rolled equivalent as a smell.
 
 Write nothing else. No implementation, no stubs beyond what the language needs to
 resolve the symbol, no second test.
@@ -264,7 +264,7 @@ Then tick the work off in `FEATURE_DIR/tasks.md`, using the map from Phase 0:
 - Touch nothing else. Never tick a task with no behavior marker, never tick one
   whose behavior is `RED`, `GREEN`, `BLOCKED`, or `BASELINE`, and never renumber or
   reword a task.
-- This is not bookkeeping. `/speckit.implement` decides what to implement from the
+- This is not bookkeeping. `__SPECKIT_COMMAND_IMPLEMENT__` decides what to implement from the
   checkboxes alone, so an unticked task the loop already drove is a second
   implementation written over freshly test-driven code. Ticking it is what makes
   the handoff safe.
@@ -291,14 +291,14 @@ Report at the end:
    line, plus the commits.
 2. The `tasks.md` tasks ticked, by id, and the open tasks that carry no behavior
    marker. Those are the non-behavioral work (scaffolding, configuration, wiring)
-   that this loop deliberately left for `/speckit.implement`.
+   that this loop deliberately left for `__SPECKIT_COMMAND_IMPLEMENT__`.
 3. Behaviors added to the list mid-loop, and why.
 4. The suite state now: counts and wall time.
 5. Anything blocked or deviating: splits, reverts, test-after admissions,
    pre-existing reds, unrelated problems noticed and deliberately not fixed.
 6. What remains on the list, and which behavior is next.
-7. Next step: `/speckit.tdd.run` again if behaviors remain, `/speckit.implement`
-   for the unmarked tasks, then `/speckit.tdd.verify` once the list is `DONE`, to
+7. Next step: `__SPECKIT_COMMAND_TDD_RUN__` again if behaviors remain, `__SPECKIT_COMMAND_IMPLEMENT__`
+   for the unmarked tasks, then `__SPECKIT_COMMAND_TDD_VERIFY__` once the list is `DONE`, to
    audit the discipline and the strength of the tests from cold context.
 
 Report honestly. A session that completed two cycles and hit a blocker is a better

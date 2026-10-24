@@ -64,5 +64,5 @@ body:
       options:
         - label: I confirm this command does not duplicate an existing one.
           required: true
-        - label: I understand a new command is a breaking change requiring a `feat!` or `BREAKING CHANGE` commit.
+        - label: I understand a new command is a breaking change requiring a `BREAKING CHANGE:` footer in the commit.
           required: true

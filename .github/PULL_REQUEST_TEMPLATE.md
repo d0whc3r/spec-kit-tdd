@@ -8,7 +8,7 @@
 
 - [ ] Bug fix (`fix:`)
 - [ ] New feature, non-breaking (`feat:`)
-- [ ] Breaking change (`feat!:` or `BREAKING CHANGE:` footer)
+- [ ] Breaking change (`BREAKING CHANGE:` footer)
 - [ ] Documentation only (`docs:`)
 - [ ] Internal refactor or chore (`refactor:` / `chore:`)
 - [ ] CI or release tooling (`ci:` / `build:`)
@@ -25,7 +25,7 @@
 
 ## Agent-boundary checklist
 
-<!-- See the "Agent Boundaries" section of AGENTS.md. -->
+<!-- See the "Rules" section of AGENTS.md. -->
 
 - [ ] The canonical command files under `commands/` are the single source of truth for the command surface.
 - [ ] `extension.yml` `provides.commands` matches the canonical command set.
@@ -37,9 +37,8 @@
 
 <!-- Show your work. Paste output, screenshots of generated artifacts, or before/after diffs. -->
 
-- [ ] `pnpm run lint` passes (or N/A)
-- [ ] `pnpm run validate` passes
-- [ ] `pnpm run lint:content` passes
+- [ ] `pnpm run check` passes (validate, sync:check, lint, lint:content)
+- [ ] `pnpm web:build` passes (or N/A)
 - [ ] I ran the affected command against a real feature (`spec.md`, `plan.md`, `tasks.md`) and inspected the output.
 
 ```

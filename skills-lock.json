@@ -5,7 +5,7 @@
       "source": "github/spec-kit",
       "sourceType": "github",
       "skillPath": ".github/skills/add-community-extension/SKILL.md",
-      "computedHash": "074d140f32a6c1acd297ec8e58f53c5612e1cfa41f22304627efca54a7e220a8"
+      "computedHash": "4ba13e73cde458791574ed096d2812cf2a3ba7ac37a2fe3c0f2df1991036950f"
     },
     "skill-creator": {
       "source": "anthropics/skills",

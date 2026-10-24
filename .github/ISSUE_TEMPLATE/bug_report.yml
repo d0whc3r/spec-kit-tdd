@@ -58,7 +58,7 @@ body:
     attributes:
       label: Spec Kit version
       description: Spec Kit core version in the host project.
-      placeholder: "0.2.0"
+      placeholder: "0.12.17"
     validations:
       required: false
 

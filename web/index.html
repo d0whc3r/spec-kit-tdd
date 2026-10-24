@@ -77,13 +77,13 @@
                   Direct install
                 </button>
                 <button
-                  id="tab-install-catalog"
+                  id="tab-install-update"
                   class="tab"
                   role="tab"
                   aria-selected="false"
-                  aria-controls="panel-install-catalog"
+                  aria-controls="panel-install-update"
                 >
-                  Via catalog
+                  Update
                 </button>
               </div>
             </div>
@@ -97,26 +97,22 @@
               <pre data-copy><code>specify extension add tdd \
   --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip</code></pre>
               <p class="install-hint">
-                Works with zero configuration. This is the most reliable path and the same one you
-                use to pin a version.
+                Works with zero configuration. Change the version in the URL to pin a release.
               </p>
             </div>
 
             <div
-              id="panel-install-catalog"
+              id="panel-install-update"
               class="tab-panel"
               role="tabpanel"
-              aria-labelledby="tab-install-catalog"
+              aria-labelledby="tab-install-update"
               hidden
             >
-              <pre data-copy><code>specify extension catalog add \
-  https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json \
-  --name community --install-allowed
-specify extension add tdd</code></pre>
+              <pre data-copy><code>specify extension add tdd --force \
+  --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip</code></pre>
               <p class="install-hint">
-                Prefer installing and updating by name? Approve the community catalog once, then
-                <code>add</code> and <code>update</code> resolve <code>tdd</code> automatically. See
-                <a href="#install-help">install help</a> for why this is needed.
+                Run the install command again with <code>--force</code> to replace an installed
+                version. Your <code>specs/</code> tree and your profile do not change.
               </p>
             </div>
           </div>
@@ -131,7 +127,7 @@ specify extension add tdd</code></pre>
 
           <ul class="hero-badges">
             <li>Four commands</li>
-            <li>Requires Spec Kit &gt;= 0.11.9</li>
+            <li>Requires Spec Kit &gt;= 0.12.17</li>
             <li>MIT licensed</li>
             <li>Any language</li>
           </ul>
@@ -171,9 +167,9 @@ specify extension add tdd</code></pre>
               <h3>Graded by someone else</h3>
               <p>
                 A loop cannot grade itself: the session that wrote the tests fills every gap from
-                memory. <code>/speckit.tdd.verify</code> runs cold, fails closed on missing
-                evidence, and never fixes what it finds. Findings become remediation tasks, not
-                silent edits.
+                memory. <code>/speckit.tdd.verify</code> (<code>/speckit-tdd-verify</code> in skills
+                agents such as Claude Code) runs cold, fails closed on missing evidence, and never
+                fixes what it finds. Findings become remediation tasks, not silent edits.
               </p>
             </article>
           </div>
@@ -254,10 +250,12 @@ specify extension add tdd</code></pre>
             <code>specs/&lt;feature&gt;/</code>.
           </p>
           <p class="note">
-            Three hooks put the right command at the right moment, at the three moments the
-            discipline is most often skipped. <code>after_tasks</code> offers <code>plan</code> and
-            <code>after_implement</code> offers <code>verify</code>; both prompt, and you can
-            decline. <code>before_implement</code> runs <code>run</code> and
+            Four hooks put the right command at the right moment, at the moments the discipline is
+            most often skipped. <code>after_tasks</code> offers <code>plan</code>,
+            <code>after_implement</code> offers <code>verify</code>, and
+            <code>after_converge</code> offers <code>plan</code> again for the tasks that
+            <code>/speckit.converge</code> appends. These three prompt, and you can decline.
+            <code>before_implement</code> runs <code>run</code> and
             <code>/speckit.implement</code> waits for it, because Spec Kit only waits for a hook
             that is not optional, and a prompt arriving after the code was written would be
             worthless. The loop ticks the tasks it drove, so <code>/speckit.implement</code> covers
@@ -328,11 +326,11 @@ specify extension add tdd</code></pre>
 - test: `src/auth/session.test.ts::accepts a token expiring now` (new)
 - red: `pnpm vitest run src/auth/session.test.ts -t "accepts a token expiring now"`
   -> `AssertionError: expected 'expired' to be undefined` (1 failed)
-- green: `src/auth/session.ts:31` changed `<` to `<=`. Suite -> 126 passed
+- green: `src/auth/session.ts:31` changed `&lt;` to `&lt;=`. Suite -> 126 passed
 - refactor: extracted `isExpired(claims, now)` from the inline comparison; suite
   re-run green after the extraction
 - commit: `9c2b117` (behavior), `5ee0a30` (structure)
-- note: U1 alone passed with both `<` and `<=`, which is exactly why the
+- note: U1 alone passed with both `&lt;` and `&lt;=`, which is exactly why the
   boundary needed its own behavior on the list.</code></pre>
                 <p class="example-note">
                   A real command, its real failure output, recorded before the fix existed. Behavior
@@ -402,7 +400,7 @@ mutants_survived: 3
                   </div>
                   <pre class="md-source"><code>| Mutant | Behavior | Survived | Judgment |
 | ------ | -------- | -------- | -------- |
-| `session.ts:31` `<=` to `<` | U2 | No | Caught by U2, boundary pinned |
+| `session.ts:31` `&lt;=` to `&lt;` | U2 | No | Caught by U2, boundary pinned |
 | `repository.ts:41` predicate inverted on the empty path | U8 | Yes | **Real gap.** U8 passes with the filter inverted: empty either way |
 | `session.ts:44` changed a debug log string | none | Yes | Equivalent mutant, no observable behavior |</code></pre>
                   <p class="example-note">
@@ -636,18 +634,27 @@ mutants_survived: 3
             <li>
               <h3>Install the extension</h3>
               <p>
-                You need Spec Kit &gt;= 0.11.9 initialized (<code>specify init</code>), a git
-                repository, and a working test runner. Install directly from the latest release;
-                this needs no catalog setup and is the recommended path:
+                You need Spec Kit &gt;= 0.12.17 initialized (<code>specify init</code>), a git
+                repository, and a working test runner. Install directly from the latest release:
               </p>
               <pre data-copy><code>specify extension add tdd \
   --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip</code></pre>
               <p>Confirm it registered:</p>
-              <pre data-copy><code>cat .specify/extensions/.registry   # 'tdd' entry present
+              <pre data-copy><code>specify extension list              # 'tdd' listed, enabled
 ls .specify/extensions/tdd          # extension files present</code></pre>
               <p class="step-aside">
-                Prefer <code>specify extension add tdd</code> by name? That needs the community
-                catalog approved first. See <a href="#install-help">install help</a>.
+                To update, run the install command with a newer release URL and add
+                <code>--force</code>. Spec Kit's community catalog is a discovery source:
+                <code>specify extension search tdd</code> and
+                <code>specify extension info tdd</code>
+                show the extension and its release archive. See
+                <a href="#install-help">install help</a>.
+              </p>
+              <p class="step-aside">
+                This page uses the dot form of the command names, which slash-command agents use,
+                such as <code>/speckit.tdd.setup</code>. Skills agents use hyphens:
+                <code>/speckit-tdd-setup</code> in Claude Code and
+                <code>$speckit-tdd-setup</code> in Codex.
               </p>
             </li>
             <li>
@@ -716,7 +723,10 @@ ls .specify/extensions/tdd          # extension files present</code></pre>
                                  -&gt; refactor -&gt; commit      tasks.md (behavioral tasks ticked)
 
 /speckit.implement          --&gt;  /speckit.tdd.verify   --&gt;  tdd/verification.md (verdict)
-  (after it finishes)            (after_implement hook)     tasks.md (remediation phase)</code></pre>
+  (after it finishes)            (after_implement hook)     tasks.md (remediation phase)
+
+/speckit.converge           --&gt;  /speckit.tdd.plan     --&gt;  tdd/test-list.md (new behaviors PENDING)
+  (after it finishes)            (after_converge hook)      tasks.md (test task before each new task)</code></pre>
           <p class="note">
             The outer loop is the feature's acceptance criteria, measured in hours. The inner loop
             is the components beneath them, measured in minutes. The acceptance test is written
@@ -736,47 +746,42 @@ ls .specify/extensions/tdd          # extension files present</code></pre>
 
           <div class="callout callout-error">
             <p class="callout-title">The error you may see</p>
-            <pre><code>Error: 'tdd' is available in the 'community' catalog but installation
-is not allowed from that catalog.
-
-To enable installation, add 'tdd' to an approved catalog
-(install_allowed: true) in .specify/extension-catalogs.yml.</code></pre>
+            <pre><code>Error: 'tdd' was found in the 'community' catalog, which is discovery-only
+...
+Don't flip such a catalog to install_allowed.</code></pre>
           </div>
 
           <p>
-            Spec Kit ships the community catalog as <strong>discovery only</strong>. It carries
-            <code>install_allowed: false</code> by design, so the CLI can list community extensions
-            but will not install one until you opt in. You have two ways to opt in.
+            Spec Kit lists community extensions in a <strong>discovery-only</strong> catalog. That
+            catalog has <code>install_allowed: false</code>, so Spec Kit does not install from it.
+            Spec Kit also advises against changing that setting. Install from the release archive
+            instead.
           </p>
 
           <div class="install-options">
             <article class="card">
-              <h3>Option A: Direct install (recommended)</h3>
+              <h3>Install a release</h3>
               <p>
-                Install straight from the release archive. No catalog config, always works, and it
-                is the only way to pin a specific version.
+                Install straight from the release archive. Spec Kit asks you to confirm the source.
+                Change the version in the URL to pin a release.
               </p>
               <pre data-copy><code>specify extension add tdd \
   --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip</code></pre>
               <p class="example-note">
-                To update later, run the same command with a newer version URL.
+                Community extensions are author-maintained, and Spec Kit does not review them.
+                Review the source before you install.
               </p>
             </article>
             <article class="card">
-              <h3>Option B: Approve the community catalog</h3>
+              <h3>Update to a newer release</h3>
               <p>
-                Do this once if you want to install and update by name. It adds the catalog with
-                <code>install_allowed: true</code> to <code>.specify/extension-catalogs.yml</code>.
+                Run the install command with the newer release URL and add <code>--force</code> to
+                replace the installed version.
               </p>
-              <pre data-copy><code>specify extension catalog add \
-  https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json \
-  --name community --install-allowed
-
-specify extension add tdd
-specify extension update tdd</code></pre>
+              <pre data-copy><code>specify extension add tdd --force \
+  --from &lt;newer-release-zip-url&gt;</code></pre>
               <p class="example-note">
-                Community extensions are author-maintained and not reviewed by Spec Kit. Review the
-                source before approving a catalog.
+                Your <code>specs/</code> tree and your profile do not change.
               </p>
             </article>
           </div>
@@ -797,11 +802,10 @@ specify extension update tdd</code></pre>
             <details>
               <summary>Why does <code>specify extension add tdd</code> fail?</summary>
               <p>
-                The extension lives in Spec Kit's community catalog, which is discovery only and
-                carries <code>install_allowed: false</code>. The CLI can list it but will not
-                install until you opt in. Either install directly with
-                <code>--from &lt;release-zip-url&gt;</code>, or approve the community catalog once.
-                Full steps are in <a href="#install-help">install help</a>.
+                The extension is listed in Spec Kit's community catalog, which is discovery only
+                (<code>install_allowed: false</code>). The CLI shows it but does not install it.
+                Install directly with <code>--from &lt;release-zip-url&gt;</code>. Full steps are in
+                <a href="#install-help">install help</a>.
               </p>
             </details>
             <details>
@@ -894,10 +898,8 @@ specify extension update tdd</code></pre>
             <details>
               <summary>How do I update the extension?</summary>
               <p>
-                If you approved the community catalog, run
-                <code>specify extension update tdd</code>. Otherwise rerun the direct install with
-                the newer release URL. Your <code>specs/</code> tree and your stack profile are not
-                touched.
+                Run the install command with the newer release URL and add <code>--force</code>.
+                Your <code>specs/</code> tree and your stack profile are not touched.
               </p>
             </details>
           </div>

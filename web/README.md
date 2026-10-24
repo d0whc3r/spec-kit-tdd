@@ -82,8 +82,8 @@ Facts on this page that must match the canonical sources and the wiki:
 - Version pin and `requires.speckit_version` (hero badges, install snippet).
 - The four command names, their descriptions, their write boundaries, and the
   modifier list.
-- The three lifecycle hooks (`after_tasks`, `before_implement`,
-  `after_implement`) and which of them prompt.
+- The four lifecycle hooks (`after_tasks`, `before_implement`,
+  `after_implement`, `after_converge`) and which of them prompt.
 - Install and usage commands.
 - The artifact layout (`.specify/memory/tdd-profile.md` plus
   `<feature dir>/tdd/{test-list,cycle-log,verification}.md`, no index file) and

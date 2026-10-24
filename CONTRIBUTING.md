@@ -8,7 +8,7 @@ The repo root IS the extension root, per the canonical Spec Kit extension layout
 
 - `extension.yml`, `README.md`, `LICENSE`, `CHANGELOG.md` at the repo root.
 - `commands/` holds the four canonical command prompts (`speckit.tdd.setup`, `speckit.tdd.plan`, `speckit.tdd.run`, `speckit.tdd.verify`); `templates/` holds the references they read (loop playbook, test list format, stack profile, test quality rubric).
-- `catalog.json` is the single-entry catalog file. Pipeline-owned fields (`version`, `download_url`, `requires.speckit_version`, `updated_at`, `created_at`) are updated by CI on every release; do not edit them by hand.
+- `catalog.json` is the single-entry catalog file. Pipeline-owned fields (`version`, `download_url`, `sha256`, `requires.speckit_version`, `updated_at`, `created_at`) are updated by CI on every release; do not edit them by hand.
 - `.github/workflows/release.yml` is the release pipeline.
 - `.github/scripts/` holds pipeline helpers (`validate-manifest.mjs`, `build-zip.mjs`, `sync-metadata.mjs`, `lint-content.mjs`).
 - `docs/` is the user-facing wiki source; `web/` is the GitHub Pages site.
@@ -49,26 +49,26 @@ ls dist/
 
 ## Cutting a Release
 
-Releases are automatic. The `release` workflow at `.github/workflows/release.yml` runs `pnpx semantic-release` on every push to `main`. Conventional Commits drive the next version, changelog, and tag.
+Releases are automatic. The `release` workflow at `.github/workflows/release.yml` runs `pnpm run check`, then `pnpm run release` (semantic-release) on every push to `main`. Conventional Commits drive the next version, changelog, and tag.
 
 1. Write commits using [Conventional Commits](https://www.conventionalcommits.org/). Examples:
    - `fix: ...` triggers a patch bump.
    - `feat: ...` triggers a minor bump.
-   - `feat!: ...` or any commit body containing `BREAKING CHANGE:` triggers a major bump.
+   - A `BREAKING CHANGE:` footer in the commit body triggers a major bump. The default angular preset ignores a `feat!:` header.
    - `chore:`, `docs:`, `refactor:`, `test:`, `ci:` do not trigger a release.
 2. Land your work on `main` with CI green. The release workflow fires on push.
 3. `semantic-release` runs the plugin chain in `.releaserc.json`:
    - Determine the next version from commits since the last tag.
    - Generate release notes and prepend them to `CHANGELOG.md`.
-   - Run `.github/scripts/semantic-release-prepare.mjs <version>` to bump `extension.yml`, refresh the direct-install URLs across the docs and website, and update `catalog.json`.
-   - Run `.github/scripts/submit-catalog-update.mjs` to render the `[Extension Submission]` document, uploaded as the `upstream-catalog-issue` artifact for manual filing at `github/spec-kit` (see **Community Catalog Submission** below).
-   - Commit `chore(release): catalog v<version>` as `github-actions[bot]` with `CHANGELOG.md`, `extension.yml`, `catalog.json`, and `README.md`.
+   - Run `.github/scripts/semantic-release-prepare.mjs <version>` to bump `extension.yml` and `package.json`, refresh the direct-install URLs across the docs and website, build the zip, and update `catalog.json` (version, download URL, and the zip's `sha256`).
+   - Commit `chore(release): catalog v<version>` as `github-actions[bot]` with the files listed under `@semantic-release/git` in `.releaserc.json`.
    - Create tag `v<version>`, publish a GitHub Release, and attach `dist/tdd-<version>.zip`.
-4. If no commits since the last tag qualify, semantic-release exits cleanly and nothing is released. Push another qualifying commit to trigger a release.
-5. To rehearse the version decision locally without publishing:
+4. After a release, the workflow adds install notes to the GitHub Release, publishes the wiki, and runs `.github/scripts/submit-catalog-update.mjs` to render the `[Extension Submission]` document. It uploads the document as the `upstream-catalog-issue` artifact for manual filing at `github/spec-kit` (see **Community Catalog Submission** below).
+5. If no commits since the last tag qualify, semantic-release exits cleanly and nothing is released. Push another qualifying commit to trigger a release.
+6. To rehearse the version decision locally without publishing:
    ```bash
    pnpm install
-   pnpx semantic-release --dry-run
+   pnpm run release:dry
    ```
 
 Re-tagging an already-released version is not supported. Push a qualifying commit so the next patch version is cut.

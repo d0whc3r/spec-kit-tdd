@@ -8,7 +8,8 @@
 //   - The command file references the template and any extra refs.
 //   - No banned AI-tell phrases.
 // Each shipped command is linted for the same prose rules (no em dash, no
-// banned phrases).
+// banned phrases), and for Spec Kit command names written as
+// __SPECKIT_COMMAND_<NAME>__ tokens inside backticks.
 // Then an oxfmt --check pass over commands, templates, and README.
 //
 // Usage: node lint-content.mjs
@@ -32,7 +33,7 @@ const RUN_CMD = "commands/speckit.tdd.run.md";
 const VERIFY_CMD = "commands/speckit.tdd.verify.md";
 
 // Shipped command bodies are linted for the same prose rules as templates
-// (AGENTS.md "Agent Boundaries" rule 4: no em dashes, plain English).
+// (AGENTS.md "Rules" 7: no em dashes, plain English).
 const COMMANDS = [SETUP_CMD, PLAN_CMD, RUN_CMD, VERIFY_CMD];
 
 // Each entry pairs a shipped reference template with the command that must
@@ -121,6 +122,18 @@ function lintProse(rel, text, fail) {
   }
 }
 
+// Shipped commands name Spec Kit commands only through __SPECKIT_COMMAND_<NAME>__
+// tokens, which Spec Kit resolves per agent at install time. oxfmt turns a token
+// outside backticks into bold text, so check for that too.
+function lintCommandRefs(rel, text, fail) {
+  if (/(^|[\s`(])\/speckit\.[a-z]/m.test(text)) {
+    fail(`literal Spec Kit command name in ${rel}: use a __SPECKIT_COMMAND_<NAME>__ token`);
+  }
+  if (text.includes("**SPECKIT_COMMAND_")) {
+    fail(`token formatted as bold in ${rel}: keep each token inside backticks`);
+  }
+}
+
 // 1-based line of the first heading line, or 0 if absent.
 function headingLine(lines, heading) {
   const idx = lines.findIndex((l) => l === `## ${heading}` || l === `## ${heading} _(optional)_`);
@@ -179,7 +192,11 @@ export async function lintContent() {
 
   for (const cmd of COMMANDS) {
     if (!exists(cmd)) fail(`${cmd} missing`);
-    else lintProse(cmd, read(cmd), fail);
+    else {
+      const text = read(cmd);
+      lintProse(cmd, text, fail);
+      lintCommandRefs(cmd, text, fail);
+    }
   }
 
   // oxfmt pass over the shipped markdown.

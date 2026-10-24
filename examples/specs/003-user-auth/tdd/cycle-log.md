@@ -71,7 +71,7 @@ existed and failed before the code that satisfies it.
 - test: `src/auth/session.test.ts::injected clock` (new)
 - red: `pnpm vitest run src/auth/session.test.ts -t "injected clock"`
   -> `AssertionError: expected clock.now to have been called 1 time, but it was
-called 0 times` (1 failed)
+  called 0 times` (1 failed)
 - green: `src/auth/session.ts:27` takes the clock from the constructor instead of
   calling `Date.now()`. Suite -> 129 passed
 - refactor: none
@@ -84,7 +84,7 @@ called 0 times` (1 failed)
 - test: `src/orders/repository.test.ts::legacy` (new, characterization)
 - red: not applicable. A characterization test captures what the code does today and
   is expected to pass immediately. It did: `pnpm vitest run
-src/orders/repository.test.ts -t "legacy"` -> 1 passed
+  src/orders/repository.test.ts -t "legacy"` -> 1 passed
 - verified with a deliberate mutant: changed the legacy branch at
   `src/orders/repository.ts:64` to drop the customer join, re-ran -> 1 failed.
   Restored, suite re-run -> 130 passed, 0 failed
@@ -119,7 +119,7 @@ src/orders/repository.test.ts -t "legacy"` -> 1 passed
 - test: `src/orders/repository.test.ts::sort order` (new)
 - red: passed on the first run. Deliberate mutant applied: removed the `ORDER BY` at
   `src/orders/repository.ts:44`, re-ran -> `AssertionError: expected [b, a] to
-deeply equal [a, b]` (1 failed). Restored, suite re-run -> 133 passed
+  deeply equal [a, b]` (1 failed). Restored, suite re-run -> 133 passed
 - green: no production change needed. The behavior existed and is now pinned against
   the refactor in cycle 11
 - refactor: none

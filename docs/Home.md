@@ -14,6 +14,8 @@ rest      ->  /speckit.implement                   (whatever was not a behavior 
 audit     ->  /speckit.tdd.verify                  (evidence, smells, mutants)
 ```
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 ## Why it exists
 
 Spec-driven development gets the specification right and then hands it to an
@@ -54,10 +56,10 @@ bug.
 | `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                     | tests, source, `tdd/cycle-log.md`, ticks the tasks it completed |
 | `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation on changed files, criteria coverage. Fails closed. | `tdd/verification.md`, remediation in `tasks.md`                |
 
-Three hooks put the right command at the right moment: `plan` after `/speckit.tasks`
-and `verify` after `/speckit.implement` both prompt and can be declined, while `run`
-runs before `/speckit.implement` writes anything, because a prompt there would arrive
-after the code was already written. Disable any hook in `.specify/extensions.yml`. All
+Four hooks put the right command at the right moment: `plan` after `/speckit.tasks`,
+`verify` after `/speckit.implement`, and `plan` again after `/speckit.converge` all
+prompt and can be declined, while `run` runs before `/speckit.implement` writes
+anything, because a prompt there would arrive after the code was already written. Disable any hook in `.specify/extensions.yml`. All
 modifiers are covered in [Commands](Commands.md).
 
 ## Hard rules

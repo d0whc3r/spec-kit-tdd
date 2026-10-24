@@ -25,6 +25,8 @@ specs/<feature>/
     └── verification.md     the audit report
 ```
 
+`/speckit.tdd.plan` is the dot form of slash-command agents. Skills agents such as Claude Code use `/speckit-tdd-plan`.
+
 `specs/<feature>/` is the usual layout, not a fixed path. The current feature comes
 from spec-kit's own resolver: `FEATURE_DIR` out of
 `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`, which reads

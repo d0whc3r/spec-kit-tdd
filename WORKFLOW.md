@@ -3,13 +3,13 @@
 This document explains how to install the extension, what each command needs as
 input, what it produces as output, and in what order to run them.
 
+Command names in this document use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 ---
 
 ## Prerequisites
 
-- Spec Kit `>=0.11.9` initialized in your project (`specify init`). That is the
-  first release that both resolves the feature directory from `.specify/feature.json`
-  and actually runs a mandatory hook, which `before_implement` depends on. The extension
+- Spec Kit `>=0.12.17` initialized in your project (`specify init`). That is the first release that resolves the command names in the extension's commands for skills agents. It also resolves the feature directory from `.specify/feature.json`, runs a mandatory hook (which `before_implement` depends on), and has `/speckit.converge`. The extension
   plugs into the core lifecycle (`/speckit.specify`, `/speckit.clarify`,
   `/speckit.plan`, `/speckit.tasks`, `/speckit.implement`), so those must be
   available.
@@ -24,27 +24,15 @@ input, what it produces as output, and in what order to run them.
 
 ## Install
 
-Install directly from the latest release. This needs no catalog setup and is the
-recommended path:
+Install directly from the latest release:
 
 ```bash
 specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
-Change the version in the URL to pin a different release.
+Change the version in the URL to pin a different release. To update, run the same command with a newer release URL and add `--force`.
 
-Prefer to install and update by name with `specify extension add tdd`? That
-resolves the extension from Spec Kit's community catalog, which ships as discovery
-only (`install_allowed: false`). Approve it once, then add and update by name:
-
-```bash
-specify extension catalog add https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json --name community --install-allowed
-specify extension add tdd
-specify extension update tdd
-```
-
-If `specify extension add tdd` fails with `installation is not allowed from that
-catalog`, that is why.
+Spec Kit's community catalog is a discovery source. `specify extension search tdd` and `specify extension info tdd` show the extension and its release archive. Install from the archive URL as shown above.
 
 After install, four slash commands become available in your assistant.
 
@@ -88,6 +76,9 @@ auditor that edits the code it grades cannot be trusted about it.
  /speckit.implement        ->  /speckit.tdd.verify  ->  evidence,       ->  verification.md (verdict)
    (after it finishes)         (after_implement hook)   smells,             tasks.md (remediation phase)
                                                         mutants
+
+ /speckit.converge         ->  /speckit.tdd.plan    ->  new tasks to    ->  test-list.md (new behaviors PENDING)
+   (after it finishes)         (after_converge hook)    behaviors           tasks.md (test task before each)
 ```
 
 ---
@@ -111,6 +102,8 @@ A typical feature, start to finish:
 Steps 1 and 2 are independent: set up the stack whenever, the spec whenever. From
 step 3 on, the order matters, because each command's precondition is the previous
 one's output.
+
+If you run `/speckit.converge` after step 6, accept its `after_converge` hook or run `/speckit.tdd.plan`. The plan gives each new converge task a behavior id and a test task before it. Then run `/speckit.implement` again, and the loop builds that work test-first.
 
 ---
 
@@ -143,6 +136,8 @@ owns (the inner loop), every line traced to the criterion or requirement it
 serves. Then it edits `tasks.md`: test tasks stop being optional, each one is
 placed before the implementation it covers, and every behavioral task carries its
 behavior id (`[U3]`) so the loop can tick it later.
+
+On a feature that already has a test list, it runs as `refresh`. It keeps every behavior id, state, and cycle-log entry, and adds only the new work, such as the tasks that `/speckit.converge` appends.
 
 ```text
 /speckit.tdd.plan

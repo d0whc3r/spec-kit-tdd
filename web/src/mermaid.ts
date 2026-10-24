@@ -16,6 +16,10 @@ function ensureMermaid(): typeof mermaid {
       startOnLoad: false,
       securityLevel: "strict",
       theme: dark ? "dark" : "default",
+      // Mermaid 12 defaults to the ELK layout (a 1.4 MB lazy chunk) and the
+      // "neo" look. Keep the v11 rendering.
+      layout: "dagre",
+      look: "classic",
     });
     initialized = true;
   }

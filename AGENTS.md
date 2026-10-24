@@ -1,142 +1,70 @@
 # AGENTS.md
 
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+This repository is the TDD extension for [Spec Kit](https://github.com/github/spec-kit). The extension adds a red-green-refactor loop to the Spec Kit lifecycle. It ships four commands, four templates, and four hooks. The repository root is the extension root.
 
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+## Commands
 
-## 1. Think Before Coding
+Use Node 24 (`.nvmrc`) and pnpm 12 (`packageManager` in `package.json`).
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
+| Command              | What it does                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `pnpm install`       | Installs the tools and the husky pre-commit hook. The hook runs oxfmt on staged files.                            |
+| `pnpm check`         | Runs `validate`, `sync:check`, `lint`, and `lint:content`. CI runs it on every pull request and before a release. |
+| `pnpm format`        | Formats all files with oxfmt.                                                                                     |
+| `pnpm sync`          | Copies the identity fields from `package.json` into `extension.yml` and `catalog.json`.                           |
+| `pnpm web:build`     | Copies `examples/` into `web/public/examples/` and builds the site into `web/dist/`.                              |
+| `pnpm build`         | Builds `dist/tdd-<version>.zip` and validates the unpacked copy. It needs `zip` and `unzip`.                      |
+| `pnpm catalog:issue` | Writes `upstream-catalog-issue-v<version>.md` for the upstream catalog. Never file or post it yourself.           |
 
-Before implementing:
+Before you finish a change, run `pnpm check` and `pnpm web:build`. Both must pass.
 
-- State your assumptions explicitly. If uncertain, ask.
-- If multiple interpretations exist, present them - don't pick silently.
-- If a simpler approach exists, say so. Push back when warranted.
-- If something is unclear, stop. Name what's confusing. Ask.
+## Layout
 
-## 2. Simplicity First
+| Path                             | Contents                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `commands/speckit.tdd.<verb>.md` | The four command prompts. Each command has one copy only.                                                           |
+| `templates/tdd-*.md`             | Reference files that the commands read at run time.                                                                 |
+| `extension.yml`                  | The manifest: commands, hooks, `category`, `effect`, and `requires.speckit_version`.                                |
+| `catalog.json`                   | The catalog entry. The release pipeline writes `version`, `download_url`, `sha256`, `requires`, and the timestamps. |
+| `package.json`                   | The source of `description`, `author`, `homepage`, `repository`, `license`, and `keywords` (the catalog `tags`).    |
+| `docs/`                          | The wiki source. `sync-wiki.yml` publishes it on every push to `main`.                                              |
+| `web/`                           | The GitHub Pages site (Vite and TypeScript). `web/public/examples/` is generated. Do not edit it.                   |
+| `examples/`                      | Real artifacts from a full loop. The site shows them.                                                               |
+| `.github/scripts/`               | The pipeline scripts (zx): validate, sync, lint, build, release, wiki, and catalog issue.                           |
+| `.agents/skills/`                | The repository skills. `.claude/skills` links here. `skills-lock.json` pins the external skills.                    |
 
-**Minimum code that solves the problem. Nothing speculative.**
+The release zip contains only `extension.yml`, `README.md`, `LICENSE`, `commands/`, and `templates/`. `.extensionignore` gives `specify extension add --dev` the same set. Keep it in sync with `INCLUDE` in `.github/scripts/build-zip.mjs`.
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+## Rules
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+1. Keep one copy of each command, at `commands/speckit.tdd.<verb>.md`.
+2. Change related files together. A command change touches the command file, `provides.commands` in `extension.yml`, the `provides.commands` count in `catalog.json`, and `REQUIRED` in `.github/scripts/validate-manifest.mjs`. A hook change touches `hooks` in `extension.yml` and the `provides.hooks` count in `catalog.json`.
+3. Treat a renamed or removed command as a breaking change. Use a `BREAKING CHANGE:` footer. The release preset (angular) ignores a `feat!:` header.
+4. When you add or rename a template, update the `TEMPLATES` table in `.github/scripts/lint-content.mjs` and the command that reads the template.
+5. Keep the write boundaries of each command. They are the product:
+   - `setup` writes `.specify/memory/tdd-profile.md`. It writes `.specify/memory/constitution.md` only after the user approves.
+   - `plan` writes `<FEATURE_DIR>/tdd/test-list.md`, the baseline entry of a new `<FEATURE_DIR>/tdd/cycle-log.md`, and `<FEATURE_DIR>/tasks.md`. When the test list exists, it runs as `refresh` and keeps every behavior id, state, and cycle-log entry.
+   - `run` is the only command that writes tests or source code. It also writes the test list, the cycle log, and the checkboxes of the `tasks.md` tasks whose behaviors are `DONE`. `/speckit.implement` reads only the checkboxes, so an unticked task gets a second, test-after implementation.
+   - `verify` writes `<FEATURE_DIR>/tdd/verification.md` and a remediation section in `tasks.md`. It never fixes what it finds.
+6. Keep two invariants in every command. A test is never weakened, skipped, deleted, or filtered out to reach green. Red evidence is recorded only for a run that happened.
+7. Write shipped content (commands and templates) in plain English with no em dashes. `pnpm lint:content` checks this and the heading order of each template.
+8. In a command, write each Spec Kit command name as a token in backticks, such as `` `__SPECKIT_COMMAND_TDD_PLAN__` ``. At install time, Spec Kit replaces it with `/speckit.tdd.plan` for slash-command agents or `/speckit-tdd-plan` for skills agents. Templates keep plain names, because Spec Kit copies them without changes. `pnpm lint:content` rejects a literal `/speckit.` name in a command.
 
-## 3. Surgical Changes
+## Gotchas
 
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
-
-## 4. Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
-
-Transform tasks into verifiable goals:
-
-- "Add validation" → "Write tests for invalid inputs, then make them pass"
-- "Fix the bug" → "Write a test that reproduces it, then make it pass"
-- "Refactor X" → "Ensure tests pass before and after"
-
-For multi-step tasks, state a brief plan:
-
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
-
----
-
-**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
-
-<!-- SPECKIT START -->
-
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
-
-<!-- SPECKIT END -->
-
-## Agent Boundaries
-
-This repository ships the TDD Extension for Spec Kit: a language-agnostic
-red-green-refactor loop for the spec-kit lifecycle. It exposes four commands
-(`/speckit.tdd.setup`, `/speckit.tdd.plan`, `/speckit.tdd.run`,
-`/speckit.tdd.verify`) and three lifecycle hooks (`after_tasks` runs `plan`,
-`before_implement` runs `run`, `after_implement` runs `verify`). Only
-`before_implement` is mandatory, because spec-kit waits for a hook solely when its
-`optional` flag is false, and an optional pre-hook would let `/speckit.implement`
-write the whole feature test-after in the same run.
-
-| Agent         | Skill Surface                           | Notes                                         |
-| ------------- | --------------------------------------- | --------------------------------------------- |
-| Spec Kit core | `commands/speckit.tdd.*.md` (canonical) | Shipped in the release zip with `templates/`. |
-
-Rules:
-
-1. Canonical command files live at `commands/speckit.tdd.<verb>.md`. There is no second copy of a command anywhere in this repo.
-2. Changing the command surface requires updating in lockstep: the canonical file, `extension.yml` `provides.commands`, the `catalog.json` `provides.commands` count, and the `REQUIRED` list in `.github/scripts/validate-manifest.mjs`. Changing the hook surface requires the same lockstep across `extension.yml` `hooks` and the `catalog.json` `provides.hooks` count.
-3. Renaming or removing a command is a breaking change and requires a `feat!:` or `BREAKING CHANGE:` commit.
-4. Adding or renaming a shipped template requires updating the `TEMPLATES` table in `.github/scripts/lint-content.mjs` with its canonical headings, and the command that references it. A template no command reads is dead weight and the lint will not catch it for you.
-5. **The per-command write boundaries are the product and are non-negotiable:**
-   - `setup` writes `.specify/memory/tdd-profile.md`, and `.specify/memory/constitution.md` only with explicit user approval.
-   - `plan` writes `specs/<feature>/tdd/test-list.md`, the baseline entry of `specs/<feature>/tdd/cycle-log.md`, and `specs/<feature>/tasks.md`.
-   - `run` is the only command that writes tests or source code, and only under the loop discipline: test first, red observed and recorded, smallest green, refactor on green. Besides those it writes `<feature>/tdd/test-list.md`, `<feature>/tdd/cycle-log.md`, and the checkboxes of the `tasks.md` tasks whose behavior ids are `DONE`. That last one is load bearing: `/speckit.implement` decides what to implement from the checkboxes alone, so an unticked task the loop drove gets a second, test-after implementation.
-   - `verify` writes `specs/<feature>/tdd/verification.md` and a remediation section in `tasks.md`. It never fixes what it finds. An auditor that edits the code it grades is worthless, and any change that blurs this is a breaking change to the extension's contract.
-6. Two invariants hold across every command and must survive every edit: a test is never weakened, skipped, deleted, or filtered out to reach green; and red-phase evidence is only ever recorded for a run that actually happened.
-7. Shipped content (commands, templates) uses plain English and no em dashes; `.github/scripts/lint-content.mjs` enforces this along with the canonical heading order of every template.
+- Keep `before_implement` at `optional: false`. Spec Kit waits only for a mandatory hook. With an optional pre-hook, `/speckit.implement` writes the feature test-after in the same run.
+- The Spec Kit minimum (`>=0.12.17`) is the first release that resolves the command tokens for skills agents. It appears in `extension.yml`, `catalog.json`, `README.md`, `WORKFLOW.md`, `docs/Getting-Started.md`, `docs/Troubleshooting.md`, and `web/index.html`. `pnpm validate` compares only the first two. Update the others by hand.
+- Keep `after_converge` pointed at `plan`. `/speckit.converge` appends tasks with no behavior ids, and without the hook `/speckit.implement` builds them test-after.
+- Do not edit versions or the pinned release URLs by hand. semantic-release sets them from Conventional Commits through `.github/scripts/semantic-release-prepare.mjs`.
+- oxfmt turns a token outside backticks into bold text (`**SPECKIT_COMMAND_TDD_PLAN**`). Keep each token inside backticks.
+- User docs (`README.md`, `WORKFLOW.md`, `docs/`, `web/`) use the dot form (`/speckit.tdd.plan`). Each page also shows the hyphen form of skills agents (`/speckit-tdd-plan`) where a command name first appears.
+- Renovate (`renovate.json`) is the only dependency updater. Every update uses the `chore` type, because no npm dependency ships in the zip.
+- oxfmt formats Markdown and indents list continuation lines. Run `pnpm format` before `pnpm check`.
 
 <!-- CODEGRAPH_START -->
 
 ## CodeGraph
 
-This project has a CodeGraph MCP server (`codegraph_*` tools) configured. CodeGraph is a tree-sitter-parsed knowledge graph of every symbol, edge, and file. Reads are sub-millisecond and return structural information grep cannot.
-
-### When to prefer codegraph over native search
-
-Use codegraph for **structural** questions — what calls what, what would break, where is X defined, what is X's signature. Use native grep/read only for **literal text** queries (string contents, comments, log messages) or after you already have a specific file open.
-
-| Question                                                       | Tool                                         |
-| -------------------------------------------------------------- | -------------------------------------------- |
-| "How does X work? / trace X / explain a system / architecture" | `codegraph_explore` (seed with symbol names) |
-| "Where is X defined?" / "Find symbol named X"                  | `codegraph_search`                           |
-| "What calls function Y?"                                       | `codegraph_callers`                          |
-| "What does Y call?"                                            | `codegraph_callees`                          |
-| "What would break if I changed Z?"                             | `codegraph_impact`                           |
-| "Show me Y's signature / source / docstring"                   | `codegraph_node`                             |
-| "Give me focused context for a task/area"                      | `codegraph_context`                          |
-| "What files exist under path/"                                 | `codegraph_files`                            |
-| "Is the index healthy?"                                        | `codegraph_status`                           |
-
-### Rules of thumb
-
-- **`codegraph_explore` is the workhorse for understanding questions** ("how does X work", "trace…", "explain the Y system"). Feed it the key symbol/file names and read its output (line-numbered source from many files in one call). If the question names nothing concrete, do one quick `codegraph_search`/`codegraph_context` to surface the names, then explore with them. Fill gaps with `codegraph_node`/Read — don't grep-and-read your way through; that's the loop explore replaces.
-- **Delegating exploration to a subagent?** Tell it to call `codegraph_explore` first and trust the result. A generic "explore"-style agent defaults to grep+Read and treats codegraph as just a search index, throwing away the token savings.
-- **Trust codegraph results.** They come from a full AST parse. Do NOT re-verify them with grep — that's slower, less accurate, and wastes context.
-- **Don't grep first** when looking up a symbol by name. `codegraph_search` is faster and returns kind + location + signature in one call.
-- **Index lag**: the file watcher debounces ~500ms behind writes; don't re-query immediately after editing a file in the same turn.
-
-### If `.codegraph/` doesn't exist
-
-The MCP server returns "not initialized." Ask the user: _"I notice this project doesn't have CodeGraph initialized. Want me to run `codegraph init -i` to build the index?"_
+`.mcp.json` configures the CodeGraph MCP server. Use `codegraph_explore` first for questions about the code in `.github/scripts/` and `web/src/`. Use grep for literal text in the Markdown content.
 
 <!-- CODEGRAPH_END -->

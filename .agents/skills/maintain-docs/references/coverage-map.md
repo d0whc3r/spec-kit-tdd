@@ -8,7 +8,7 @@ The reverse direction (canonical file → which pages depend on it) is at
 the bottom.
 
 Only user-facing pages appear here. Contributor and tooling docs
-(`CONTRIBUTING.md`, `AGENTS.md`/`CLAUDE.md`) are out of this skill's
+(`CONTRIBUTING.md`, `AGENTS.md`) are out of this skill's
 scope and are intentionally absent.
 
 ## Wiki pages
@@ -67,7 +67,7 @@ Asserts:
   per-command write boundaries in `AGENTS.md`.
 - Every modifier each command file recognizes, with no invented ones. The
   modifier summary table must list exactly the union of them.
-- All three hooks, which command each runs, and each one's `optional` flag,
+- All four hooks, which command each runs, and each one's `optional` flag,
   matching `extension.yml.hooks`. `before_implement` is not optional on
   purpose: spec-kit only waits for a hook whose flag is false, so a page that
   describes it as a prompt is wrong.
@@ -355,7 +355,7 @@ echoes.
   pipeline checks, release procedure, catalog submission, style coupling,
   branch naming. User-facing pages link here for contributor questions;
   the skill does not edit it.
-- `AGENTS.md` / `CLAUDE.md` — agent behavioral guidelines and the
+- `AGENTS.md` — agent behavioral guidelines and the
   per-command write boundaries. Repo governance, not user docs.
 - `SECURITY.md`, `SUPPORT.md`, `CODE_OF_CONDUCT.md` — standard repo
   files. Leave alone unless explicitly asked.

@@ -2,6 +2,8 @@
 
 Where the loop sits in the spec-kit lifecycle, and what it leaves behind.
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 ## The lifecycle with TDD in it
 
 ```
@@ -25,6 +27,9 @@ Where the loop sits in the spec-kit lifecycle, and what it leaves behind.
 
  /speckit.implement          ->  /speckit.tdd.verify     ->  specs/<feature>/tdd/verification.md
    (after it finishes)           (after_implement hook)      tasks.md (remediation phase)
+
+ /speckit.converge           ->  /speckit.tdd.plan       ->  test-list.md (new behaviors PENDING)
+   (after it finishes)           (after_converge hook)       tasks.md (test task before each new task)
 ```
 
 `setup` is independent of any feature. Everything from `plan` onward is per feature,
@@ -51,6 +56,10 @@ written twice, the second time test-after over freshly test-driven code.
 
 Either way, `/speckit.tdd.verify` grades the result the same way, and it reports a task
 ticked against a behavior that is not `DONE`.
+
+## After `/speckit.converge`
+
+`/speckit.converge` compares the code with the spec, the plan, and the tasks, and appends the unbuilt work to `tasks.md` as new tasks. Those tasks have no behavior ids, so `/speckit.implement` would build them test-after. The `after_converge` hook offers `/speckit.tdd.plan` at that moment. The plan keeps every existing behavior id, state, and cycle-log entry. It gives each new behavioral task a new behavior and a test task before it. Then run `/speckit.implement` again, and the loop builds that work test-first.
 
 ## The double loop
 

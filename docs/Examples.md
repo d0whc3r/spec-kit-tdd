@@ -15,6 +15,8 @@ requirements, two components, eleven cycles.
 | [`cycle-log.md`](../examples/specs/003-user-auth/tdd/cycle-log.md)       | `/speckit.tdd.run`    |
 | [`verification.md`](../examples/specs/003-user-auth/tdd/verification.md) | `/speckit.tdd.verify` |
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 The stack is TypeScript because an example has to be written in something. It costs you
 nothing if you are not in TypeScript: the same feature under pytest, `go test`, JUnit,
 or `cargo test` produces the same four files with the same sections, and three lines per

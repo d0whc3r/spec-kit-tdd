@@ -1,6 +1,6 @@
 # Test Quality
 
-What `/speckit.tdd.verify` grades against, and why a green suite is not the same as a
+What `/speckit.tdd.verify` (`/speckit-tdd-verify` in skills agents such as Claude Code) grades against, and why a green suite is not the same as a
 tested feature. The canonical rubric ships as
 [`templates/tdd-test-quality-rubric.md`](../templates/tdd-test-quality-rubric.md).
 

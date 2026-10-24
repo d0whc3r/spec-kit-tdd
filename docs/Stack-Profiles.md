@@ -3,7 +3,7 @@
 How the extension stays language agnostic. The canonical reference ships as
 [`templates/tdd-stack-profile.md`](../templates/tdd-stack-profile.md).
 
-Nothing in the loop knows what ecosystem you are in. `/speckit.tdd.setup` detects the
+Nothing in the loop knows what ecosystem you are in. `/speckit.tdd.setup` (`/speckit-tdd-setup` in skills agents such as Claude Code) detects the
 stack, proves each command by running it, and writes `.specify/memory/tdd-profile.md`.
 Every later command reads that file and stops if it is missing, rather than guessing a
 command that might not exist.

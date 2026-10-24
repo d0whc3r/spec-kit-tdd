@@ -6,6 +6,8 @@
 //   - extension.version present, and equals the release version on a tag run
 //     (RELEASE_VERSION env, or a refs/tags/v* GITHUB_REF)
 //   - all required runtime files exist and are non-empty
+//   - catalog.json agrees with extension.yml (version, command and hook
+//     counts, requires.speckit_version, category, effect)
 //
 // Usage:
 //   node validate-manifest.mjs                 # validate the repo root
@@ -131,6 +133,15 @@ export function validateManifest({ root = repoRoot } = {}) {
         `catalog.json requires.speckit_version ${catalogSpeckit} != extension.yml ${extSpeckit}`,
       );
       ok = false;
+    }
+
+    for (const key of ["category", "effect"]) {
+      if (catalog[key] !== manifest.extension?.[key]) {
+        log.fail(
+          `catalog.json ${key} ${catalog[key]} != extension.yml extension.${key} ${manifest.extension?.[key]}`,
+        );
+        ok = false;
+      }
     }
   }
 

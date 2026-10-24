@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "dompurify": "3.4.13",
-    "marked": "18.0.9",
-    "mermaid": "11.16.1"
+    "dompurify": "3.4.17",
+    "marked": "18.1.1",
+    "mermaid": "12.2.0"
   },
   "devDependencies": {
     "typescript": "7.0.2",
-    "vite": "8.2.1"
+    "vite": "8.3.5"
   }
 }

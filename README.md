@@ -21,6 +21,8 @@ rest      ->  /speckit.implement                   (whatever was not a behavior 
 audit     ->  /speckit.tdd.verify                  (evidence, smells, mutants)
 ```
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 ## Documentation
 
 The full guide lives in the **[project wiki](https://github.com/d0whc3r/spec-kit-tdd/wiki)**. This README is the front door only.
@@ -51,12 +53,7 @@ The wiki is generated from [`docs/`](docs/) on every push to `main`. To browse t
 | `/speckit.tdd.run`    | Drives the loop: one failing test, red proven and recorded, smallest green, refactor on green, one commit.                                 | tests, source, `tdd/cycle-log.md`, ticks the tasks it completed |
 | `/speckit.tdd.verify` | Audits from cold context: test-first evidence in git, test smells, mutation testing on the changed files, criteria coverage. Fails closed. | `tdd/verification.md`, remediation in `tasks.md`                |
 
-Three hooks put the right command at the right moment. `plan` after `/speckit.tasks` and
-`verify` after `/speckit.implement` both prompt and can be declined. `run` runs before
-`/speckit.implement` writes anything and it waits, because a prompt at that point would
-arrive after the code was already written. The loop ticks the tasks it drove, so
-`/speckit.implement` covers only what is left. Disable any hook in
-`.specify/extensions.yml`.
+Four hooks put the right command at the right moment. `plan` after `/speckit.tasks`, `verify` after `/speckit.implement`, and `plan` again after `/speckit.converge` all prompt and can be declined. `run` runs before `/speckit.implement` writes anything and it waits, because a prompt at that point would arrive after the code was already written. The loop ticks the tasks it drove, so `/speckit.implement` covers only what is left. The `plan` run after `/speckit.converge` gives each new task from converge a behavior id and a test task first, so the loop also builds that work test-first. Disable any hook in `.specify/extensions.yml`.
 
 ## What it enforces
 
@@ -96,22 +93,17 @@ composed: the test reference, the red command, and the failure output.
 
 ## Install
 
-Install directly from the latest release. This needs no catalog setup and is the recommended path:
+Requires Spec Kit `>=0.12.17` initialized in the project (`specify init`).
+
+Install directly from the latest release:
 
 ```bash
 specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
-Change the version in the URL to pin a different release.
+Change the version in the URL to pin a different release. To update, run the same command with a newer release URL and add `--force`.
 
-Want to install by name with `specify extension add tdd`? That resolves the extension from Spec Kit's community catalog, which ships as discovery only (`install_allowed: false`). Approve it once:
-
-```bash
-specify extension catalog add https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json --name community --install-allowed
-specify extension add tdd
-```
-
-If `specify extension add tdd` fails with `installation is not allowed from that catalog`, that is why. See [Troubleshooting](https://github.com/d0whc3r/spec-kit-tdd/wiki/Troubleshooting#installation-errors).
+Spec Kit's community catalog is a discovery source. `specify extension search tdd` and `specify extension info tdd` show the extension and its release archive. Install from the archive URL as shown above. See [Troubleshooting](https://github.com/d0whc3r/spec-kit-tdd/wiki/Troubleshooting#installation-errors).
 
 For prerequisites and the first-run walkthrough see [Getting Started](https://github.com/d0whc3r/spec-kit-tdd/wiki/Getting-Started).
 

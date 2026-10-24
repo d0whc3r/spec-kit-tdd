@@ -14,9 +14,12 @@ work is not the command that does it.
 Every path is relative to the feature directory spec-kit resolves, which is usually
 `specs/<feature>/` but never assumed to be.
 
-Three hooks put the right command at the right moment if you leave them enabled.
-`after_tasks` offers `plan` and `after_implement` offers `verify`; both prompt, and
-you can decline. `before_implement` runs `run` and `/speckit.implement` waits for it,
+This page uses the dot form of the command names, which slash-command agents use, such as `/speckit.tdd.setup`. Skills agents use hyphens: `/speckit-tdd-setup` in Claude Code and `$speckit-tdd-setup` in Codex. The modifiers stay the same.
+
+Four hooks put the right command at the right moment if you leave them enabled.
+`after_tasks` offers `plan`, `after_implement` offers `verify`, and `after_converge`
+offers `plan` again for the tasks that `/speckit.converge` appends. These three prompt,
+and you can decline. `before_implement` runs `run` and `/speckit.implement` waits for it,
 because spec-kit only waits for a hook that is not optional, and a prompt that arrives
 after the code is written would be worthless. Disable any of them in
 `.specify/extensions.yml`.
@@ -114,6 +117,8 @@ preserved, and every edit is reported.
 On `refresh`, behavior ids are never reused or renumbered, dropped behaviors stay
 in the table with a reason, and a criterion that changed materially is reported
 rather than silently re-tested. See [Test List Format](Test-List-Format.md).
+
+When the test list already exists, the command runs as `refresh` without the modifier. The cycle log stays as it is. An open task with no behavior id, such as a task that `/speckit.converge` appends, gets a new behavior, its id, and a test task before it. A gap in a `DONE` behavior gets a new behavior, and the `DONE` behavior keeps its state. The `after_converge` hook starts this run.
 
 ---
 

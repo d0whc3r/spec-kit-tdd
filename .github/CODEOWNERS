@@ -6,7 +6,7 @@
 *                                       @d0whc3r
 
 # Canonical command surface and agent mirrors. Changes here must respect the
-# agent-boundary rule in AGENTS.md.
+# "Rules" section in AGENTS.md.
 /commands/                              @d0whc3r
 /.claude/skills/                        @d0whc3r
 /.agents/skills/                        @d0whc3r
@@ -24,7 +24,6 @@
 
 # Project-wide policy documents.
 /AGENTS.md                              @d0whc3r
-/CLAUDE.md                              @d0whc3r
 /CONTRIBUTING.md                        @d0whc3r
 /CODE_OF_CONDUCT.md                     @d0whc3r
 /SECURITY.md                            @d0whc3r

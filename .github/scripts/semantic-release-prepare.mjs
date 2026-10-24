@@ -4,7 +4,7 @@
 //   2. sync identity fields from package.json into the manifests
 //   3. bump the pinned release URL across docs + website, and the header badge
 //   4. build the deterministic zip
-//   5. update catalog.json
+//   5. update catalog.json (version, download URL, zip sha256)
 //
 // Usage: node semantic-release-prepare.mjs <version>
 
@@ -76,9 +76,9 @@ export async function prepare(version) {
   // keep the version-bumped package.json formatted alongside the rest
   await format(PATHS.pkg);
 
-  // build the deterministic zip, then update the catalog
-  await buildZip();
-  await updateCatalog({ version, downloadUrl: url });
+  // build the deterministic zip, then update the catalog with its checksum
+  const zipPath = await buildZip();
+  await updateCatalog({ version, downloadUrl: url, zipPath });
 }
 
 if (isMain(import.meta.url)) {

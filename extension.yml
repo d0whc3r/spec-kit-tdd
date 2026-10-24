@@ -9,13 +9,17 @@ extension:
   repository: https://github.com/d0whc3r/spec-kit-tdd
   homepage: https://d0whc3r.github.io/spec-kit-tdd/
   license: MIT
+  category: process
+  effect: read-write
 
 requires:
-  # 0.8.1 is the first release that resolves the feature directory from
-  # SPECIFY_FEATURE_DIRECTORY or .specify/feature.json, and 0.11.9 the first that
-  # actually invokes a mandatory hook instead of only printing its directive. The
-  # commands and the before_implement hook below depend on both.
-  speckit_version: ">=0.11.9"
+  # 0.12.17 is the first release that resolves the __SPECKIT_COMMAND_<NAME>__
+  # tokens in the commands for agents that install commands as skills. Older
+  # releases that the commands also depend on: 0.8.1 resolves the feature
+  # directory from SPECIFY_FEATURE_DIRECTORY or .specify/feature.json, 0.11.2
+  # adds /speckit.converge and its hooks, and 0.11.9 invokes a mandatory hook
+  # (before_implement below) instead of only printing its directive.
+  speckit_version: ">=0.12.17"
 
 provides:
   commands:
@@ -52,6 +56,13 @@ hooks:
     optional: true
     prompt: "Audit TDD discipline and test strength for this feature?"
     description: "Write specs/<feature>/tdd/verification.md: test-first evidence, test-smell rubric, mutation results, and acceptance-criteria coverage"
+  # /speckit.converge appends unbuilt work to tasks.md as new tasks. Without
+  # behavior ids, /speckit.implement builds them test-after.
+  after_converge:
+    command: speckit.tdd.plan
+    optional: true
+    prompt: "Add the new converge tasks to the TDD test list so they get a failing test first?"
+    description: "Re-run the plan on the existing test list: give each new behavioral task from /speckit.converge a behavior id and a test task before it, and keep every existing id, state, and cycle-log entry"
 
 tags:
   - acceptance-tests
@@ -59,8 +70,6 @@ tags:
   - property-based-testing
   - quality
   - red-green-refactor
-  - spec-kit
-  - spec-kit-extension
   - tdd
   - test-driven-development
   - test-first

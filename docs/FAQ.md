@@ -1,5 +1,7 @@
 # FAQ
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 ## Why not just tell the agent to write tests first?
 
 Because "write the test first" is an instruction, and what you need is evidence. An
@@ -240,11 +242,10 @@ invoking `/speckit.tdd.run` inside your own session, not a background process.
 
 ## How do I update it?
 
-If you approved the community catalog, `specify extension update tdd`. Otherwise re-run
-the direct install with a newer release URL:
+Run the install command with a newer release URL and add `--force`:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip --force
 ```
 
 Your `specs/` tree and your profile are not touched.

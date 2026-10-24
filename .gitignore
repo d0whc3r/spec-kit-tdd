@@ -20,5 +20,3 @@ upstream-catalog-issue-*.md
 
 # Dependency caches (none expected, but defensive)
 node_modules/
-
-dist/

@@ -7,7 +7,7 @@ What the extension is, and what happens when you run a command.
 The release zip contains Markdown and nothing else:
 
 ```
-extension.yml                          the manifest: 4 commands, 3 hooks
+extension.yml                          the manifest: 4 commands, 4 hooks
 README.md
 LICENSE
 commands/
@@ -80,6 +80,8 @@ is worse than no command at all.
 
 ## What happens on each run
 
+Command names on this page use the dot form of slash-command agents, such as `/speckit.tdd.plan`. Skills agents such as Claude Code use hyphens, such as `/speckit-tdd-plan`.
+
 **`/speckit.tdd.setup`** reads the manifests, the scripts they define, the CI config, the
 test layout, and the lock file. Then it runs each candidate command, including the
 single-test command twice (against a name that exists and a name that does not). It
@@ -110,9 +112,10 @@ hooks:
   after_tasks: speckit.tdd.plan # optional: true
   before_implement: speckit.tdd.run # optional: false
   after_implement: speckit.tdd.verify # optional: true
+  after_converge: speckit.tdd.plan # optional: true
 ```
 
-They sit at the three moments the discipline is most often skipped:
+They sit at the moments the discipline is most often skipped:
 
 - **`after_tasks`.** Tasks have just been generated with tests still marked optional. This
   is where the test list gets derived and the optionality removed. Optional, because
@@ -126,6 +129,7 @@ They sit at the three moments the discipline is most often skipped:
   no arguments, which is why the loop's default is `all`.
 - **`after_implement`.** The suite is green and nobody wants to look closer. This is where
   the audit runs. Optional, same reason as `after_tasks`.
+- **`after_converge`.** `/speckit.converge` has just appended unbuilt work to `tasks.md` as new tasks with no behavior ids. The plan runs again on the existing test list, keeps every id, state, and cycle-log entry, and gives each new behavioral task a behavior and a test task before it. Optional, same reason as `after_tasks`.
 
 **How the two implementation paths avoid doing the work twice.** `/speckit.implement`
 decides what to implement from the `[X]` checkboxes in `tasks.md` and nothing else, so the

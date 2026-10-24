@@ -1,4 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"]
+  "description": "No npm dependency ships in the extension zip, so every update uses chore and never triggers a semantic-release version.",
+  "extends": ["config:recommended", ":semanticCommitTypeAll(chore)"]
 }

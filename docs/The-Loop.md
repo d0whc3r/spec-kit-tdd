@@ -1,6 +1,6 @@
 # The Loop
 
-The discipline `/speckit.tdd.run` follows and `/speckit.tdd.verify` grades against.
+The discipline `/speckit.tdd.run` follows and `/speckit.tdd.verify` grades against. Skills agents such as Claude Code name them `/speckit-tdd-run` and `/speckit-tdd-verify`.
 The canonical version ships with the extension as
 [`templates/tdd-loop-playbook.md`](../templates/tdd-loop-playbook.md); this page is
 the user-facing tour of it.

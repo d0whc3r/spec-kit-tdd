@@ -2,66 +2,61 @@
 
 ## Installation errors
 
-### `installation is not allowed from that catalog`
+### "found in the 'community' catalog, which is discovery-only"
 
-```
-Error: 'tdd' is available in the 'community' catalog but installation
-is not allowed from that catalog.
-
-To enable installation, add 'tdd' to an approved catalog
-(install_allowed: true) in .specify/extension-catalogs.yml.
+```text
+Error: 'tdd' was found in the 'community' catalog, which is discovery-only
 ```
 
-Expected behavior, not a broken release. Spec Kit ships the community catalog as
-discovery only, so the CLI can list community extensions but will not install one until
-you opt in. Two ways forward.
+This is expected behavior. Spec Kit lists community extensions in a discovery-only catalog (`install_allowed: false`) and does not install from it. Spec Kit advises against setting that catalog to `install_allowed`.
 
-**Direct install (recommended).** No catalog config, always works, and the only way to
-pin a version:
+Install the extension directly from the release archive. This is also how you pin a version:
 
 ```bash
 specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
-**Approve the community catalog once**, if you want to install and update by name:
+To update, run the same command with a newer release URL and add `--force`.
 
-```bash
-specify extension catalog add https://raw.githubusercontent.com/github/spec-kit/main/extensions/catalog.community.json --name community --install-allowed
-specify extension add tdd
-```
-
-Community extensions are author-maintained and not reviewed by Spec Kit. Read the source
-before approving a catalog.
+Community extensions are author-maintained, and Spec Kit does not review them. Review the source before you install.
 
 ### The commands do not appear
 
 Check the extension registered and the files are there:
 
 ```bash
-cat .specify/extensions/.registry   # 'tdd' entry present
+specify extension list              # 'tdd' listed, enabled
 ls .specify/extensions/tdd          # extension.yml, commands/, templates/
 ```
 
-Then restart or reload your assistant so it re-reads the command set. If the registry
-entry exists and the files do not, re-run the install.
+Then restart or reload your assistant so it re-reads the command set. If the extension
+is listed and the files are missing, re-run the install.
+
+Check the name you type. Slash-command agents use the dot form, such as `/speckit.tdd.setup`. Skills agents use hyphens: `/speckit-tdd-setup` in Claude Code and `$speckit-tdd-setup` in Codex.
+
+### A command shows `__SPECKIT_COMMAND_TDD_RUN__` instead of a command name
+
+Spec Kit replaces these tokens with the command names of your agent when it installs the extension. Releases before 0.12.17 skip this step for skills agents. Upgrade Spec Kit, then install the extension again with `--force`.
 
 ### The hooks never fire
 
-Three hooks ship: `after_tasks` runs `plan`, `before_implement` runs `run`, and
-`after_implement` runs `verify`. `after_tasks` and `after_implement` are `optional: true`,
-so they prompt rather than run silently. If nothing prompts, check `auto_execute_hooks` in
+Four hooks ship: `after_tasks` runs `plan`, `before_implement` runs `run`,
+`after_implement` runs `verify`, and `after_converge` runs `plan` again. `after_tasks`,
+`after_implement`, and `after_converge` are `optional: true`, so they prompt rather than
+run silently. If nothing prompts, check `auto_execute_hooks` in
 `.specify/extensions.yml` and that the `tdd` entry is listed under `installed`. You can
 always run all four commands by hand; the hooks are a convenience, not a requirement.
 
 Hooks also need a recent Spec Kit. Before 0.11.9, spec-kit printed a mandatory hook's
-directive without actually invoking it, which is why this extension requires `>=0.11.9`.
+directive without actually invoking it. This extension requires `>=0.12.17`.
 
 ### `/speckit.implement` wrote the feature without running the loop
 
 Check that `before_implement` in `.specify/extensions.yml` still reads `optional: false`.
 spec-kit waits for a hook only when the flag is false; an optional pre-hook prints its
 offer and the same run carries on to implement every unchecked task, test-after. If the
-flag is right and the loop still did not run, you are on a Spec Kit older than 0.11.9.
+flag is right and the loop still did not run, check `specify --version`. Spec Kit releases
+before 0.11.9 only print the directive, and this extension requires `>=0.12.17`.
 
 ### You want `/speckit.implement` without the loop in front of it
 

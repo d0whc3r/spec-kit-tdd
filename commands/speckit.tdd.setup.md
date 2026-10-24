@@ -10,7 +10,7 @@ each command by running it**, and write one profile at
 `.specify/memory/tdd-profile.md`.
 
 Run this once per repository, and again when the stack changes. Everything
-downstream (`/speckit.tdd.plan`, `/speckit.tdd.run`, `/speckit.tdd.verify`) reads
+downstream (`__SPECKIT_COMMAND_TDD_PLAN__`, `__SPECKIT_COMMAND_TDD_RUN__`, `__SPECKIT_COMMAND_TDD_VERIFY__`) reads
 this file and fails loudly if it is missing.
 
 A wrong profile is worse than no profile. A single-test command that silently
@@ -130,7 +130,7 @@ until it runs.
    `single: null` and note that the loop must run whole files.
 3. **Coverage**, if a tool exists. Confirm a report is produced.
 4. **Mutation**, if a tool exists, scoped to one small file. Confirm it completes
-   and record how long it took. That number decides whether `/speckit.tdd.verify`
+   and record how long it took. That number decides whether `__SPECKIT_COMMAND_TDD_VERIFY__`
    can use it per feature or only in CI.
 5. **Watch mode and the acceptance runner**, briefly, where they exist.
 
@@ -164,8 +164,8 @@ Rules for the file:
 ### Phase 4: Propose the constitution principle
 
 TDD survives only where it is written into the project's own rules. In spec-kit
-that is `.specify/memory/constitution.md`, which `/speckit.plan`,
-`/speckit.tasks`, and `/speckit.implement` all read. Without it, the next session
+that is `.specify/memory/constitution.md`, which `__SPECKIT_COMMAND_PLAN__`,
+`__SPECKIT_COMMAND_TASKS__`, and `__SPECKIT_COMMAND_IMPLEMENT__` all read. Without it, the next session
 that skips tests is behaving correctly by the project's own definition.
 
 The constitution is the user's document, so:
@@ -198,7 +198,7 @@ Report, in this order:
    viable, mutation run time, areas with no runner.
 5. **The constitution outcome**: applied, declined, or conflicting, with the text
    either way.
-6. **Next step**: run `/speckit.tdd.plan` on the current feature to derive its
+6. **Next step**: run `__SPECKIT_COMMAND_TDD_PLAN__` on the current feature to derive its
    test list.
 
 State plainly what you did not check. A profile presented as complete when a whole

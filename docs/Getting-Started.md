@@ -5,9 +5,7 @@ one cycle, longer if your suite is slow.
 
 ## Prerequisites
 
-- Spec Kit `>=0.11.9` initialized in the project (`specify init`). That is the first
-  release that both resolves the feature directory from `.specify/feature.json` and
-  actually runs a mandatory hook, which the `before_implement` hook depends on.
+- Spec Kit `>=0.12.17` initialized in the project (`specify init`). That is the first release that resolves the command names in the extension's commands for skills agents. It also resolves the feature directory from `.specify/feature.json`, and it runs a mandatory hook, which the `before_implement` hook depends on.
 - A git repository.
 - **A working test runner.** The extension detects and uses whatever is there. It
   will not create one for you: standing up a test framework is a feature's worth of
@@ -15,22 +13,30 @@ one cycle, longer if your suite is slow.
 
 ## 1. Install
 
-Install directly from the latest release. No catalog setup, and this is the only
-way to pin a version:
+Install directly from the latest release:
 
 ```bash
 specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
 ```
 
+Spec Kit shows the source URL and asks you to confirm. Change the version in the URL to pin a different release.
+
+To update later, run the install command with a newer release URL and add `--force`:
+
+```bash
+specify extension add tdd --from <newer-release-zip-url> --force
+```
+
 Confirm it registered:
 
 ```bash
-cat .specify/extensions/.registry   # 'tdd' entry present
+specify extension list              # 'tdd' listed, enabled
 ls .specify/extensions/tdd          # extension files present
 ```
 
-Prefer `specify extension add tdd` by name? That needs the community catalog
-approved once. See [Troubleshooting](Troubleshooting.md#installation-errors).
+Spec Kit's community catalog is a discovery source. `specify extension search tdd` and `specify extension info tdd` show the extension and its release archive. Install from the archive URL as shown above. See [Troubleshooting](Troubleshooting.md#installation-errors).
+
+This guide uses the dot form of the command names, which slash-command agents use, such as `/speckit.tdd.setup`. Skills agents use hyphens: type `/speckit-tdd-setup` in Claude Code and `$speckit-tdd-setup` in Codex.
 
 ## 2. Set up the stack, once
 
