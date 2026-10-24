@@ -59,7 +59,7 @@ ticked against a behavior that is not `DONE`.
 
 ## After `/speckit.converge`
 
-`/speckit.converge` compares the code with the spec, the plan, and the tasks, and appends the unbuilt work to `tasks.md` as new tasks. Those tasks have no behavior ids, so `/speckit.implement` would build them test-after. The `after_converge` hook offers `/speckit.tdd.plan` at that moment. The plan keeps every existing behavior id, state, and cycle-log entry. It gives each new behavioral task a new behavior and a test task before it. Then run `/speckit.implement` again, and the loop builds that work test-first.
+`/speckit.converge` compares the code with the spec, the plan, and the tasks, and appends the unbuilt work to `tasks.md` as new tasks. Those tasks have no behavior ids, so `/speckit.implement` would build them test-after. The `after_converge` hook offers `/speckit.tdd.plan` at that moment. The plan keeps every existing behavior id, state, and cycle-log entry. It gives each new behavioral task a behavior id and a test task before it. A task that changes no behavior, such as documentation or configuration, gets no id, and `/speckit.implement` builds it. Then run `/speckit.implement` again, and the loop builds that work test-first. When converge reports that the feature converged, it appended nothing, so decline the prompt. If you decline it after converge appended tasks, run `/speckit.tdd.plan` before `/speckit.implement`.
 
 ## The double loop
 

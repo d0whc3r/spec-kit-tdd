@@ -137,6 +137,27 @@ What is left unticked is the work that never belonged in a red-green cycle: scaf
 configuration, wiring. `/speckit.tdd.verify` checks the coupling from the other side and
 reports a task ticked against a behavior that is not `DONE`.
 
+## How does it interact with `/speckit.converge`?
+
+`/speckit.converge` compares the code with `spec.md`, `plan.md`, and `tasks.md`. When it
+finds unbuilt work, it appends that work to `tasks.md` as new tasks under a
+`## Phase N: Convergence` heading. That section is its only write: the code, the spec, the
+plan, and the existing tasks stay as they are. The new tasks have no behavior ids, so
+`/speckit.implement` would build them test-after.
+
+The `after_converge` hook offers `/speckit.tdd.plan` at that moment. The plan runs as
+`refresh`. It keeps every behavior id, state, and cycle-log entry, and gives each new
+behavioral task a behavior id and a test task before it. A task that changes no behavior,
+such as documentation or configuration, gets no id, and `/speckit.implement` builds it.
+Then run `/speckit.implement` again. The loop builds the new behaviors test-first and ticks
+their tasks, and `/speckit.implement` builds the rest. Repeat `/speckit.converge` until it
+reports that the feature converged.
+
+The hook prompts, and you can decline it. Decline it when converge reports that the
+feature converged, because converge appended nothing. If converge appended tasks and you
+declined, run `/speckit.tdd.plan` yourself before `/speckit.implement`. The full sequence
+is in [Workflow](Workflow.md#after-speckitconverge).
+
 ## Can I change the discipline without forking the extension?
 
 Yes. All four commands resolve their reference documents through Spec Kit's template

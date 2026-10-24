@@ -271,8 +271,11 @@ grew. Do not regenerate from scratch:
   that `__SPECKIT_COMMAND_CONVERGE__` appended in a `Convergence` phase. If the task
   changes behavior, append a new behavior that traces to the criterion or
   requirement the task names, put the new id on the task, and insert its test task
-  before it. A gap in a `DONE` behavior gets a new behavior; never reopen the `DONE`
-  one. A task that changes no behavior gets no marker and stays for
+  before it. If a behavior that is not `DONE` yet (`PENDING`, `RED`, `GREEN`, or
+  `BLOCKED`) already covers the task, put that id on the task instead and add no
+  behavior, so a converge run during an unfinished cycle does not duplicate it. A
+  gap in a `DONE` behavior gets a new behavior; never reopen the `DONE` one. A task
+  that changes no behavior gets no marker and stays for
   `__SPECKIT_COMMAND_IMPLEMENT__`.
 - A behavior whose criterion disappeared from `spec.md` becomes `DROPPED` with a
   one-line reason. Never delete the row; it is the record of what was decided.

@@ -118,7 +118,7 @@ On `refresh`, behavior ids are never reused or renumbered, dropped behaviors sta
 in the table with a reason, and a criterion that changed materially is reported
 rather than silently re-tested. See [Test List Format](Test-List-Format.md).
 
-When the test list already exists, the command runs as `refresh` without the modifier. The cycle log stays as it is. An open task with no behavior id, such as a task that `/speckit.converge` appends, gets a new behavior, its id, and a test task before it. A gap in a `DONE` behavior gets a new behavior, and the `DONE` behavior keeps its state. The `after_converge` hook starts this run.
+When the test list already exists, the command runs as `refresh` without the modifier. The cycle log stays as it is. An open behavioral task with no behavior id, such as a task that `/speckit.converge` appends, gets a new behavior, its id, and a test task before it. If a behavior that is not `DONE` yet already covers the task, the task gets that id instead. A task that changes no behavior gets no id and stays for `/speckit.implement`. A gap in a `DONE` behavior gets a new behavior, and the `DONE` behavior keeps its state. The `after_converge` hook starts this run.
 
 ---
 

@@ -889,6 +889,19 @@ Don't flip such a catalog to install_allowed.</code></pre>
               </p>
             </details>
             <details>
+              <summary>How does it interact with <code>/speckit.converge</code>?</summary>
+              <p>
+                <code>/speckit.converge</code> appends unbuilt work to <code>tasks.md</code> as new
+                tasks with no behavior ids, so <code>/speckit.implement</code> would build them
+                test-after. The <code>after_converge</code> hook offers
+                <code>/speckit.tdd.plan</code> at that moment. The plan keeps every behavior id,
+                state, and cycle-log entry, and gives each new behavioral task a behavior id and a
+                test task before it. Then run <code>/speckit.implement</code> again, and the loop
+                builds that work test-first. If converge appended tasks and you declined the prompt,
+                run <code>/speckit.tdd.plan</code> before <code>/speckit.implement</code>.
+              </p>
+            </details>
+            <details>
               <summary>Does the extension run by itself?</summary>
               <p>
                 No. The commands are Markdown prompts. They need a Spec Kit-aware assistant to

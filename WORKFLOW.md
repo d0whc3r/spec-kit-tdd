@@ -103,7 +103,7 @@ Steps 1 and 2 are independent: set up the stack whenever, the spec whenever. Fro
 step 3 on, the order matters, because each command's precondition is the previous
 one's output.
 
-If you run `/speckit.converge` after step 6, accept its `after_converge` hook or run `/speckit.tdd.plan`. The plan gives each new converge task a behavior id and a test task before it. Then run `/speckit.implement` again, and the loop builds that work test-first.
+If you run `/speckit.converge` after step 6, accept its `after_converge` hook or run `/speckit.tdd.plan`. The plan gives each new behavioral converge task a behavior id and a test task before it. Then run `/speckit.implement` again, and the loop builds that work test-first.
 
 ---
 
