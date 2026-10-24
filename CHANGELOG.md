@@ -1,5 +1,17 @@
 # Changelog
 
+# [2.0.0](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.1.2...v2.0.0) (2026-10-24)
+
+
+### Features
+
+* require Spec Kit 0.12.17, add an after_converge hook and per-agent command names ([e0fc5ae](https://github.com/d0whc3r/spec-kit-tdd/commit/e0fc5ae35c7edbc4b2b710d773ebf720fb697b88))
+
+
+### BREAKING CHANGES
+
+* the extension now requires Spec Kit 0.12.17 or later.
+
 ## [1.1.2](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.1.1...v1.1.2) (2026-08-03)
 
 

@@ -245,7 +245,7 @@ invoking `/speckit.tdd.run` inside your own session, not a background process.
 Run the install command with a newer release URL and add `--force`:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip --force
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v2.0.0/tdd-2.0.0.zip --force
 ```
 
 Your `specs/` tree and your profile are not touched.

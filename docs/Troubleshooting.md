@@ -13,7 +13,7 @@ This is expected behavior. Spec Kit lists community extensions in a discovery-on
 Install the extension directly from the release archive. This is also how you pin a version:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v1.1.2/tdd-1.1.2.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v2.0.0/tdd-2.0.0.zip
 ```
 
 To update, run the same command with a newer release URL and add `--force`.
