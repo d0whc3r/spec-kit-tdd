@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/d0whc3r/spec-kit-tdd/compare/v2.0.0...v2.0.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* **plan:** reuse an open behavior for a converge task and document converge ([546dcf5](https://github.com/d0whc3r/spec-kit-tdd/commit/546dcf5bde964cd9de918870717faab8a91bd0b6)), closes [#15](https://github.com/d0whc3r/spec-kit-tdd/issues/15)
+
 # [2.0.0](https://github.com/d0whc3r/spec-kit-tdd/compare/v1.1.2...v2.0.0) (2026-10-24)
 
 

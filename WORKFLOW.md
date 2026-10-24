@@ -27,7 +27,7 @@ Command names in this document use the dot form of slash-command agents, such as
 Install directly from the latest release:
 
 ```bash
-specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v2.0.0/tdd-2.0.0.zip
+specify extension add tdd --from https://github.com/d0whc3r/spec-kit-tdd/releases/download/v2.0.1/tdd-2.0.1.zip
 ```
 
 Change the version in the URL to pin a different release. To update, run the same command with a newer release URL and add `--force`.
