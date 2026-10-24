@@ -2,7 +2,8 @@ name: render-catalog-issue
 description: Render the upstream Spec Kit catalog submission issue and upload it as an artifact for manual filing.
 # To reproduce locally, run the same renderer: `pnpm run catalog:issue`
 # (wraps .github/scripts/submit-catalog-update.mjs). It writes
-# upstream-catalog-issue-v<version>.md to the repo root.
+# upstream-catalog-issue-v<version>.md and the issue body alone in
+# upstream-catalog-issue-v<version>.body.md to the repo root.
 
 inputs:
   version:
@@ -26,6 +27,9 @@ outputs:
   file:
     description: Path to the rendered markdown document.
     value: ${{ steps.render.outputs.file }}
+  body-file:
+    description: Path to the issue body alone, for gh issue create --body-file.
+    value: ${{ steps.render.outputs.body-file }}
 
 runs:
   using: composite
@@ -43,6 +47,7 @@ runs:
         out="upstream-catalog-issue-v${version}.md"
         OUTPUT_FILE="$out" node .github/scripts/submit-catalog-update.mjs "$version" "${{ inputs.release-type }}" "$tag"
         echo "file=$out" >> "$GITHUB_OUTPUT"
+        echo "body-file=${out%.md}.body.md" >> "$GITHUB_OUTPUT"
 
     - name: Publish catalog issue to job summary
       shell: bash
@@ -52,6 +57,8 @@ runs:
       uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ steps.render.outputs.file }}
+        path: |
+          ${{ steps.render.outputs.file }}
+          ${{ steps.render.outputs.body-file }}
         if-no-files-found: error
         retention-days: 7

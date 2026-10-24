@@ -1,14 +1,18 @@
-// Render a ready-to-paste [Extension Submission] issue for github/spec-kit as a
-// markdown document. The release pipeline uploads it as an artifact so a
-// maintainer can file the issue manually (automatic issue creation against the
-// upstream repo proved unreliable).
+// Render a ready-to-file [Extension Submission] issue for github/spec-kit. The
+// release pipeline uploads it as an artifact so a maintainer can file the issue
+// manually (automatic issue creation against the upstream repo proved
+// unreliable).
 //
 // Flow:
 //   1. Look up the current entry in upstream catalog.community.json.
 //        present -> title "[Extension]: Update <name> to vX.Y.Z"
 //        absent  -> title "[Extension]: Add <name>"
-//   2. Render the manual steps + issue title + issue body from catalog.json.
-//   3. Write the document to OUTPUT_FILE.
+//   2. Render the issue body from catalog.json and extension.yml. Its `###`
+//      headings match the upstream issue form labels, which the upstream
+//      catalog workflow parses.
+//   3. Write the body to <OUTPUT_FILE minus .md>.body.md (for
+//      `gh issue create --body-file`) and the filing steps plus the body to
+//      OUTPUT_FILE.
 //
 // Env: UPSTREAM_REPO (default github/spec-kit), OUTPUT_FILE (default
 //      upstream-catalog-issue-v<version>.md), GITHUB_REPOSITORY (else derived
@@ -25,24 +29,30 @@ import { logger } from "./lib/log.mjs";
 
 const log = logger("submit-catalog-update");
 
-// Per-command bullets from extension.yml (the canonical list; catalog.json only
-// carries the count).
+// Per-command and per-hook bullets from extension.yml (the canonical lists;
+// catalog.json only carries the counts). An event may hold one hook or a list.
 function keyFeatures(fallbackCount, docs) {
-  const commands = readExtension().provides?.commands ?? [];
-  const bullets = commands.map((c) => `- \`/${c.name}\`: ${c.description}`).join("\n");
+  const ext = readExtension();
+  const commands = (ext.provides?.commands ?? []).map((c) => `- \`/${c.name}\`: ${c.description}`);
+  const hooks = Object.entries(ext.hooks ?? {}).flatMap(([event, list]) =>
+    [list]
+      .flat()
+      .map((h) => `- \`${event}\` hook${h.optional ? " (optional)" : ""}: ${h.description}`),
+  );
+  const bullets = [...commands, ...hooks].join("\n");
   return bullets || `- ${fallbackCount} command(s) under \`/speckit.tdd.*\`. See ${docs}.`;
 }
 
-// True if the upstream community catalog already lists this extension.
-async function hasUpstreamEntry(upstreamRepo, id) {
+// The upstream community catalog entry for this extension, or null.
+async function upstreamEntry(upstreamRepo, id) {
   const url = `https://raw.githubusercontent.com/${upstreamRepo}/main/extensions/catalog.community.json`;
   try {
     const res = await fetch(url);
-    if (!res.ok) return false;
+    if (!res.ok) return null;
     const json = await res.json();
-    return Boolean(json.extensions?.[id]);
+    return json.extensions?.[id] ?? null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -57,6 +67,7 @@ export async function renderCatalogIssue({
   if (!v) throw new Error("version required (and catalog.json .version empty)");
   const tag = gitTag || `v${v}`;
   const out = outputFile || `upstream-catalog-issue-v${v}.md`;
+  const bodyOut = out.replace(/\.md$/, ".body.md");
   const upstreamRepo = process.env.UPSTREAM_REPO || "github/spec-kit";
 
   const slug = await resolveRepoSlug();
@@ -68,44 +79,45 @@ export async function renderCatalogIssue({
   const homepage = catalog.homepage ?? "";
   const repo = catalog.repository;
 
-  const present = await hasUpstreamEntry(upstreamRepo, id);
-  const action = present ? "Update" : "Add";
-  const title = present ? `[Extension]: Update ${name} to v${v}` : `[Extension]: Add ${name}`;
+  const prev = await upstreamEntry(upstreamRepo, id);
+  const action = prev ? "Update" : "Add";
+  const title = prev ? `[Extension]: Update ${name} to v${v}` : `[Extension]: Add ${name}`;
   const newIssueUrl = `https://github.com/${upstreamRepo}/issues/new/choose`;
   const titleQuery = title.replaceAll(" ", "+");
+  const lead = prev
+    ? `> **Update to an existing catalog entry.** The \`${id}\` entry in \`extensions/catalog.community.json\` is at ${prev.version}. This request moves it to ${v}. Please keep the existing \`created_at\`, \`downloads\`, and \`stars\`.`
+    : `> **New catalog entry** for \`${id}\` v${v}.`;
 
-  // downloads, stars, and verified belong to the upstream maintainers: emitting
-  // our local zeros would ask them to reset their own counters. Drop them and
-  // let the existing upstream values stand.
-  const entry = { ...catalog, version: v, download_url: url };
-  for (const owned of ["downloads", "stars", "verified"]) delete entry[owned];
-  const proposedEntry = JSON.stringify({ [id]: entry }, null, 2);
+  // The maintainers own created_at, downloads, stars, and verified. On an
+  // update, propose the values the catalog already holds.
+  const proposedEntry = JSON.stringify(
+    {
+      [id]: {
+        ...catalog,
+        version: v,
+        download_url: url,
+        verified: prev?.verified ?? false,
+        downloads: prev?.downloads ?? 0,
+        stars: prev?.stars ?? 0,
+        created_at: prev?.created_at ?? catalog.created_at,
+      },
+    },
+    null,
+    2,
+  );
 
   const features = keyFeatures(catalog.provides?.commands, docs);
 
-  const doc = `# Upstream catalog issue — ${action} ${name} v${v}
+  // Same shape as the upstream form placeholder: "- node (>=22.0.0) - required".
+  const tools =
+    (catalog.requires?.tools ?? [])
+      .map(
+        (t) =>
+          `- ${t.name}${t.version ? ` (${t.version})` : ""} - ${t.required ? "required" : "optional"}`,
+      )
+      .join("\n") || "None. The extension adds no tool or runtime dependency beyond Spec Kit.";
 
-> Generated by the \`${repo}\` release pipeline. File this issue manually
-> on the upstream Spec Kit repo.
-
-## How to file this issue
-
-1. Open the new-issue page: ${newIssueUrl}
-2. Pick the **Extension Submission** template.
-3. Set the issue **title** to (copy exactly):
-
-   \`${title}\`
-
-4. Fill each form field with the matching value from the **Issue body** section
-   below (each \`###\` heading maps to one form field).
-5. Before submitting, check there is no open issue with the same title at
-   https://github.com/${upstreamRepo}/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+${titleQuery}
-
----
-
-## Issue body
-
-> **Submission** from \`${repo}\` release pipeline. ${action} request for \`${id}\` v${v}.
+  const body = `${lead}
 
 ### Extension ID
 
@@ -157,7 +169,7 @@ ${catalog.requires?.speckit_version}
 
 ### Required Tools (optional)
 
-None. This extension is plain Markdown command and template text. It adds no external tool or runtime dependencies beyond Spec Kit itself.
+${tools}
 
 ### Number of Commands
 
@@ -181,7 +193,7 @@ ${features}
 - [x] All commands execute without errors
 - [x] Documentation is complete and accurate
 - [x] No security vulnerabilities identified
-- [x] Tested on at least one real project (CI release pipeline)
+- [x] Tested on at least one real project
 
 ### Submission Requirements
 
@@ -198,8 +210,9 @@ ${features}
 
 - Manifest validation (\`pnpm run validate\`) confirms \`extension.yml\` and \`catalog.json\` agree on version, command count, and hook count.
 - Content lint (\`pnpm run lint:content\`) enforces the output style rules every command must follow.
-- The release archive \`tdd-${v}.zip\` is built and attached to the GitHub release at tag \`${tag}\`.
-- Install is exercised from the published download URL above.
+- The release archive \`${id}-${v}.zip\` is built and attached to the GitHub release at tag \`${tag}\`. The proposed entry carries its \`sha256\`.
+
+**Install check:** before filing, the archive at the download URL above was installed into a new Spec Kit project with \`specify extension add ${id} --from <download URL>\`.
 
 **Test project:** the committed \`examples/\` artifacts (a test list, a cycle log, and a verification report) come from running the full loop on a real codebase.
 
@@ -236,8 +249,42 @@ Full user documentation lives on the project website (${homepage}) and the proje
 A complete, real worked example (a test list, the cycle log with its recorded red output, and the verification report) is committed at ${repo}/tree/main/examples so reviewers and users can see exactly what each command reads and writes.
 `;
 
+  const doc = `# Upstream catalog issue — ${action} ${name} v${v}
+
+> Generated by the \`${repo}\` release pipeline. File this issue manually
+> on the upstream Spec Kit repo.
+
+## How to file this issue
+
+1. Check that no open issue has the same title:
+   https://github.com/${upstreamRepo}/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+${titleQuery}
+2. Install the release into a new Spec Kit project and confirm the commands
+   appear. The body states that this install works.
+
+   \`\`\`bash
+   specify init catalog-check --integration claude --non-interactive
+   cd catalog-check && specify extension add ${id} --from ${url}
+   \`\`\`
+
+3. File the issue from the repo root. \`${bodyOut}\` holds the **Issue body**
+   section below.
+
+   \`\`\`bash
+   gh issue create --repo ${upstreamRepo} --title "${title}" --body-file ${bodyOut}
+   \`\`\`
+
+   Without the GitHub CLI, open ${newIssueUrl}, pick **Extension Submission**,
+   set the title, and copy each \`###\` section into its form field.
+
+---
+
+## Issue body
+
+${body}`;
+
+  fs.writeFileSync(bodyOut, body);
   fs.writeFileSync(out, doc);
-  log.ok(`wrote ${action} v${v} document to ${out}`);
+  log.ok(`wrote ${action} v${v} document to ${out} and body to ${bodyOut}`);
   return out;
 }
 
